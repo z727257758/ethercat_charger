@@ -7,11 +7,15 @@
 #include "hpm_flash.h"
 #include "hpm_flashmap.h"
 #include "hpm_gpio_drv.h"
+#include "hpm_common.h"
 #include "hpm_ota.h"
-#include "ota_port.h"
 
 #ifndef BIT
 #define BIT(n) (1UL << (n))
+#endif
+
+#ifndef BOOTUSER_PBUTN_BOOTMODE
+#define BOOTUSER_PBUTN_BOOTMODE 0
 #endif
 
 static bool bootuser_check_pbutn_bootmode(void)
@@ -118,25 +122,17 @@ int main(void)
 
     printf("EtherCAT charger bootuser\r\n");
 
-    if (hpm_flash_init() == 0) {
+    if (hpm_flash_init() != status_success) {
         printf("Flash init failed, stay in bootuser mode.\r\n");
     } else {
-        boot_index = bootuser_select_jump_app(true);
+        boot_index = bootuser_select_jump_app(BOOTUSER_PBUTN_BOOTMODE != 0);
         printf("APP index:%d\r\n", boot_index);
         if (boot_index >= 0) {
             hpm_appindex_jump((uint8_t)boot_index);
         }
     }
 
-    printf("Bootuser FoE recovery mode.\r\n");
-    if (hpm_ota_init() != 0) {
-        printf("FoE OTA init failed.\r\n");
-        while (1) {
-        }
-    }
-
+    printf("No valid APP, stay in bootuser.\r\n");
     while (1) {
-        hpm_ota_polling_handle();
     }
 }
-

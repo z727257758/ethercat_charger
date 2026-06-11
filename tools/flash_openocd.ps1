@@ -3,10 +3,11 @@ param(
     [string]$Target = "all",
     [string]$Probe = "cmsis_dap",
     [string]$Soc = "hpm5e00",
+    [string]$BoardCfg = "",
     [string]$BootElf = "",
     [string]$UserElf = "",
-    [ValidateSet("halt_resume", "reset_run")]
-    [string]$ResetMode = "halt_resume",
+    [ValidateSet("reset_soc", "halt_resume", "reset_run", "reset_run_resume")]
+    [string]$ResetMode = "reset_soc",
     [int]$ResetDelayMs = 300,
     [switch]$NoVerify,
     [switch]$NoResetRun
@@ -25,7 +26,8 @@ if (-not (Test-Path $openocd)) {
     $openocd = "openocd"
 }
 
-$env:OPENOCD_SCRIPTS = Join-Path $env:HPM_SDK_BASE "boards\openocd"
+$openocdScripts = Join-Path $env:HPM_SDK_BASE "boards\openocd"
+$env:OPENOCD_SCRIPTS = $openocdScripts
 
 if ($BootElf -eq "") {
     $BootElf = Join-Path $root "build\ninja\bootuser\output\demo.elf"
@@ -34,7 +36,9 @@ if ($UserElf -eq "") {
     $UserElf = Join-Path $root "build\ninja\user_app\output\demo.elf"
 }
 
-$boardCfg = Join-Path $root "boards\hpm5e31_LuckyCAT\hpm5e31_LuckyCAT.cfg"
+if ($BoardCfg -eq "") {
+    $BoardCfg = Join-Path $openocdScripts "boards\hpm5e00evk.cfg"
+}
 $probeCfg = "probes\$Probe.cfg"
 $socCfg = "soc\$Soc.cfg"
 $verifyArg = if ($NoVerify) { "" } else { " verify" }
@@ -58,21 +62,28 @@ if ($Target -eq "all" -or $Target -eq "user_app") {
     $commands += "program $($UserElf.Replace('\', '/'))$verifyArg"
 }
 if (-not $NoResetRun) {
-    if ($ResetMode -eq "halt_resume") {
+    if ($ResetMode -eq "reset_soc") {
+        $commands += "reset_soc"
+    } elseif ($ResetMode -eq "halt_resume") {
         $commands += "reset halt"
         $commands += "sleep 100"
         $commands += "resume"
+    } elseif ($ResetMode -eq "reset_run") {
+        $commands += "reset run"
     } else {
         $commands += "reset run"
+        $commands += "sleep 100"
+        $commands += "resume"
     }
     $commands += "sleep $ResetDelayMs"
 }
-$commands += "shutdown"
+$commands += "exit"
 
 $args = @(
+    "-s", $openocdScripts,
     "-f", $probeCfg,
     "-f", $socCfg,
-    "-f", $boardCfg
+    "-f", $BoardCfg
 )
 
 foreach ($cmd in $commands) {
@@ -83,7 +94,7 @@ Write-Host "OpenOCD: $openocd"
 Write-Host "Target : $Target"
 Write-Host "Probe  : $Probe"
 Write-Host "SOC    : $Soc"
-Write-Host "Board  : $boardCfg"
+Write-Host "Board  : $BoardCfg"
 if (-not $NoResetRun) {
     Write-Host "Reset  : $ResetMode, delay ${ResetDelayMs}ms"
 } else {
