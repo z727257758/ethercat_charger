@@ -5,6 +5,9 @@ param(
     [string]$Soc = "hpm5e00",
     [string]$BootElf = "",
     [string]$UserElf = "",
+    [ValidateSet("halt_resume", "reset_run")]
+    [string]$ResetMode = "halt_resume",
+    [int]$ResetDelayMs = 300,
     [switch]$NoVerify,
     [switch]$NoResetRun
 )
@@ -55,7 +58,14 @@ if ($Target -eq "all" -or $Target -eq "user_app") {
     $commands += "program $($UserElf.Replace('\', '/'))$verifyArg"
 }
 if (-not $NoResetRun) {
-    $commands += "reset run"
+    if ($ResetMode -eq "halt_resume") {
+        $commands += "reset halt"
+        $commands += "sleep 100"
+        $commands += "resume"
+    } else {
+        $commands += "reset run"
+    }
+    $commands += "sleep $ResetDelayMs"
 }
 $commands += "shutdown"
 
@@ -74,6 +84,10 @@ Write-Host "Target : $Target"
 Write-Host "Probe  : $Probe"
 Write-Host "SOC    : $Soc"
 Write-Host "Board  : $boardCfg"
+if (-not $NoResetRun) {
+    Write-Host "Reset  : $ResetMode, delay ${ResetDelayMs}ms"
+} else {
+    Write-Host "Reset  : disabled"
+}
 
 & $openocd @args
-
