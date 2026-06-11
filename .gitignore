@@ -1,0 +1,41 @@
+# Build outputs
+build/
+.cache/
+output/
+
+# CMake/Ninja generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+build.ninja
+*.ninja
+*.tmp*
+
+# IDE generated projects
+iar_embedded_workbench/
+segger_embedded_studio/
+*.ewp
+*.eww
+*.ewd
+*.emProject
+*.emSession
+
+# Firmware artifacts
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.uf2
+update_sign.bin
+
+# Python/tool caches
+__pycache__/
+*.pyc
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
