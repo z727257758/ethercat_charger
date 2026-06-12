@@ -22,4 +22,4 @@ sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/port/hpm_ecat_e2p_emulation.c)
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/port/hpm_ecat_foe.c)
 
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/ecat_foe_support.c)
-sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/ecat_foe.c)
+sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/ecat_slave.c)

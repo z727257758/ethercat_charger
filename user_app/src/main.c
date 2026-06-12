@@ -3,27 +3,27 @@
 #include "FreeRTOS.h"
 #include "board.h"
 #include "charger_app.h"
+#include "ecat_slave.h"
 #include "hpm_ota.h"
-#include "ota_port.h"
 #include "task.h"
 
-#define ECAT_OTA_TASK_PRIORITY   (configMAX_PRIORITIES - 2)
+#define ECAT_TASK_PRIORITY       (configMAX_PRIORITIES - 2)
 #define CHARGER_TASK_PRIORITY    (configMAX_PRIORITIES - 4)
 #define STATUS_TASK_PRIORITY     (configMAX_PRIORITIES - 6)
 
 static charger_rxpdo_t s_demo_rxpdo;
 
-static void ecat_ota_task(void *pvParameters)
+static void ecat_task(void *pvParameters)
 {
     (void)pvParameters;
 
-    if (hpm_ota_init() != 0) {
-        printf("FoE OTA init failed.\r\n");
+    if (ecat_slave_init() != 0) {
+        printf("EtherCAT slave init failed.\r\n");
         vTaskDelete(NULL);
     }
 
     while (1) {
-        hpm_ota_polling_handle();
+        ecat_slave_poll();
         vTaskDelay(pdMS_TO_TICKS(2));
     }
 }
@@ -69,11 +69,11 @@ int main(void)
 
     printf("EtherCAT charger user app, OTA%d\r\n", hpm_ota_get_nowrunning_app());
 
-    xTaskCreate(ecat_ota_task,
-                "ecat_ota",
+    xTaskCreate(ecat_task,
+                "ecat",
                 configMINIMAL_STACK_SIZE * 2,
                 NULL,
-                ECAT_OTA_TASK_PRIORITY,
+                ECAT_TASK_PRIORITY,
                 NULL);
     xTaskCreate(charger_task,
                 "charger",
@@ -93,4 +93,3 @@ int main(void)
     while (1) {
     }
 }
-

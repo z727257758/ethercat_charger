@@ -12,10 +12,11 @@
 #include "hpm_ecat_foe.h"
 #include "hpm_flash.h"
 #include "ota_port.h"
+#include "ecat_slave.h"
 
 extern bool foe_reset_request;
 
-int hpm_ota_init(void)
+int ecat_slave_init(void)
 {
     hpm_stat_t stat;
     int ret = hpm_flash_init();
@@ -29,9 +30,9 @@ int hpm_ota_init(void)
 
     board_init_ethercat(HPM_ESC); /* init ESC function pins */
     board_init_switch_led();      /* init switch and led for ECAT display */
-    printf("ECAT FOE Funcation\n");
+    printf("EtherCAT slave init: CoE/PDO + FoE OTA\n");
 
-    /* Config ESC with FOE function to download app */
+    /* Config ESC and mailbox services for CoE/PDO plus FoE firmware download */
     stat = ecat_hardware_init(HPM_ESC);
     if (stat != status_success) {
         printf("Init ESC peripheral and related devices(EEPROM/PHY) failed!\n");
@@ -67,7 +68,7 @@ int hpm_ota_init(void)
     return 0;
 }
 
-void hpm_ota_polling_handle(void)
+void ecat_slave_poll(void)
 {
     if(bRunApplication == TRUE) {
         if (foe_reset_request) {
