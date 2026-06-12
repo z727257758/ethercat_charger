@@ -150,7 +150,7 @@ V4.00 APPL 6: The main function was split in MainInit and MainLoop
 #undef _APPL_INTERFACE_
 
 /*ECATCHANGE_START(V5.13) CIA402 3*/
-#include "foe_charger.h"
+#include "ethercat_charger.h"
 
 #include "eeprom.h"
 #undef SET_EEPROM_PTR

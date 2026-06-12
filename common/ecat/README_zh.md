@@ -1,10 +1,8 @@
-# ECAT_FOE
+# EtherCAT Charger
 
 ## 1. 概述
 
-ECAT_FOE示例用于演示基于HPM6E80的ECAT外设和从站协议栈代码(SSC)实现ECAT FOE读写从站文件的功能。
-
-关于使用ECAT FOE更新firmware的功能演示， 请参考hpm_apps中OTA相关例程。
+本目录用于 HPM5E31 LuckyCAT EtherCAT Charger 从站，包含 SSC 生成代码、CoE/PDO 对象字典、FoE OTA 通道和 HPM EtherCAT port。
 
 hpm_apps仓库：
   github: https://github.com/hpmicro/hpm_apps
@@ -27,10 +25,10 @@ hpm_apps仓库：
   请参照ECAT_IO的README
 
 ### 4.2 SSC Tool中导入配置文件
-  配置文件路径为: SSC/Config/HPM_ECAT_FOE_Config.xml
+  配置文件路径为: SSC/Config/HPM_ECAT_CHARGER_Config.xml
 
 ### 4.3 SSC Tool中创建新的工程
-  应用文件路径为：SSC/foe.xlsx
+  应用文件路径为：SSC/ethercat_charger_objects.xlsx
 
 ### 4.4 生成协议栈代码
   协议栈代码输出路径为: SSC/Src
@@ -39,7 +37,7 @@ hpm_apps仓库：
   请参照ECAT_IO的README
 
 ### 5.1. 添加ESI文件
-  ESI文件名称: ECAT_FOE.xml
+  ESI文件名称: ethercat_charger.xml
 
 ### 5.2 创建工程
   请参照ECAT_IO的README
@@ -51,7 +49,7 @@ hpm_apps仓库：
   请参照ECAT_IO的README
 
 ### 5.5 更新EEPROM
-  请选择**foe**设备描述文件
+  请选择 **ethercat_charger** 设备描述文件
   ![](doc/twincat_eeprom_update.png)
 
 

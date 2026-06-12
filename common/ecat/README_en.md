@@ -1,10 +1,8 @@
-# ECAT_FOE
+# EtherCAT Charger
 
 ## 1. Overview
 
-The ECAT_FOE example demonstrates the functionality of ECAT FOE to write and read slave files.
-
-Using ECAT FOE to update firmware, please refer to the OTA sample in hpm_apps repo.
+This directory contains the HPM5E31 LuckyCAT EtherCAT Charger slave stack integration, including SSC generated code, CoE/PDO object dictionary, FoE OTA channel, and the HPM EtherCAT port.
 
 hpm_apps repo：
   github: https://github.com/hpmicro/hpm_apps
@@ -27,10 +25,10 @@ Due to licensing issues, HPMSDK does not provide EtherCAT slave protocol stack c
   Please refer to the README of ECAT_IO sample
 
 ### 4.2 SSC Tool import configuration files
-  configuration file path: SSC/Config/HPM_ECAT_FOE_Config.xml
+  configuration file path: SSC/Config/HPM_ECAT_CHARGER_Config.xml
 
 ### 4.3 SSC Tool create new project
-  application file path: SSC/foe.xlsx
+  application file path: SSC/ethercat_charger_objects.xlsx
 
 ### 4.4 Create slave stack files
   stack code output path: SSC/Src
@@ -39,7 +37,7 @@ Due to licensing issues, HPMSDK does not provide EtherCAT slave protocol stack c
   Please refer to the README of ECAT_IO sample
 
 ### 5.1. Add ESI file
-  ESI file name: ECAT_FOE.xml
+  ESI file name: ethercat_charger.xml
 
 ### 5.2 Create Project
   Please refer to the README of ECAT_IO sample
@@ -51,7 +49,7 @@ Due to licensing issues, HPMSDK does not provide EtherCAT slave protocol stack c
   Please refer to the README of ECAT_IO sample
 
 ### 5.5 Update EEPROM context
-  select **foe**
+  select **ethercat_charger**
   ![](doc/twincat_eeprom_update.png)
 
 

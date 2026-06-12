@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <EtherCATInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="EtherCATInfo.xsd" Version="1.6">
 	<Vendor>
-		<Id>#x1234</Id>
-		<Name>test</Name>
+		<Id>#x0048504D</Id>
+		<Name>HPMicro</Name>
 		<ImageData16x14>424DE6000000000000007600000028000000100000000E000000010004000000000070000000120B0000120B0000100000001000000000000000000080000080000000808000800000008000800080800000C0C0C000808080000000FF0000FF000000FFFF00FF000000FF00FF00FFFF0000FFFFFF009D9DD99DD9DDD9DD9D9D9DD9D9DDD9DD999D9DD9D999D9999D9D9DD9D9DDD9DD9D9DD99DD999D999DDDDDDDDDDDDDDDD88888888888888888888888888888888DDDDDDDDDDDDDDDD999D999DD99DD9D99D9D9DDD9DD9D9D999DD999D9DDDD99D9D9D9DDD9DD9D99D999D999DD99DD9D9</ImageData16x14>
 	</Vendor>
 	<Descriptions>
@@ -15,8 +15,8 @@
 		</Groups>
 		<Devices>
 			<Device Physics="YY">
-				<Type ProductCode="#x00000002" RevisionNo="#x00000001">foe_charger</Type>
-				<Name>foe_charger</Name>
+				<Type ProductCode="#x00000002" RevisionNo="#x00000001">ethercat_charger</Type>
+				<Name>ethercat_charger</Name>
 				<Info>
 					<StateMachine>
 						<Timeout>

@@ -4,19 +4,19 @@
 */
 
 /**
-* \addtogroup foe_charger foe_charger
+* \addtogroup ethercat_charger ethercat_charger
 * @{
 */
 
 /**
-\file foe_chargerObjects
+\file ethercat_chargerObjects
 \author ET9300Utilities.ApplicationHandler (Version 1.6.4.0) | EthercatSSC@beckhoff.com
 
-\brief foe_charger specific objects<br>
+\brief ethercat_charger specific objects<br>
 \brief NOTE : This file will be overwritten if a new object dictionary is generated!<br>
 */
 
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 #define PROTO
 #else
 #define PROTO extern
@@ -56,7 +56,7 @@ OBJCONST UCHAR OBJMEM aName0x1600[] = "Charger RxPDO process data mapping\000"
 "SubIndex 004\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -68,13 +68,13 @@ UINT32 SI3; /* Subindex3 - Reference to 0x7000.3 */
 UINT32 SI4; /* Subindex4 - Reference to 0x7000.4 */
 } OBJ_STRUCT_PACKED_END
 TOBJ1600;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ1600 ChargerRxPDOProcessDataMapping0x1600
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={4,0x70000110,0x70000220,0x70000320,0x70000410}
 #endif
 ;
@@ -120,7 +120,7 @@ OBJCONST UCHAR OBJMEM aName0x1A00[] = "Charger TxPDO process data mapping\000"
 "SubIndex 005\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -133,13 +133,13 @@ UINT32 SI4; /* Subindex4 - Reference to 0x6000.4 */
 UINT32 SI5; /* Subindex5 - Reference to 0x6000.5 */
 } OBJ_STRUCT_PACKED_END
 TOBJ1A00;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ1A00 ChargerTxPDOProcessDataMapping0x1A00
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={5,0x60000110,0x60000220,0x60000320,0x60000410,0x60000510}
 #endif
 ;
@@ -173,7 +173,7 @@ OBJCONST TSDOINFOENTRYDESC    OBJMEM asEntryDesc0x1C12[] = {
 OBJCONST UCHAR OBJMEM aName0x1C12[] = "SyncManager 2 assignment\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -182,13 +182,13 @@ UINT16   u16SubIndex0;  /**< \brief Subindex 0 */
 UINT16 aEntries[1];  /**< \brief Subindex 1 - 1 */
 } OBJ_STRUCT_PACKED_END
 TOBJ1C12;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ1C12 sRxPDOassign
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={1,{0x1600}}
 #endif
 ;
@@ -222,7 +222,7 @@ OBJCONST TSDOINFOENTRYDESC    OBJMEM asEntryDesc0x1C13[] = {
 OBJCONST UCHAR OBJMEM aName0x1C13[] = "SyncManager 3 assignment\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -231,13 +231,13 @@ UINT16   u16SubIndex0;  /**< \brief Subindex 0 */
 UINT16 aEntries[1];  /**< \brief Subindex 1 - 1 */
 } OBJ_STRUCT_PACKED_END
 TOBJ1C13;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ1C13 sTxPDOassign
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={1,{0x1A00}}
 #endif
 ;
@@ -283,7 +283,7 @@ OBJCONST UCHAR OBJMEM aName0x6000[] = "Charger TxPDO\000"
 "ota_state\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -296,13 +296,13 @@ UINT16 Fault_code; /* Subindex4 - fault_code */
 UINT16 Ota_state; /* Subindex5 - ota_state */
 } OBJ_STRUCT_PACKED_END
 TOBJ6000;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ6000 ChargerTxPDO0x6000
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={5,0x0000,0x00000000,0x00000000,0x0000,0x0000}
 #endif
 ;
@@ -345,7 +345,7 @@ OBJCONST UCHAR OBJMEM aName0x7000[] = "Charger RxPDO\000"
 "command\000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -357,13 +357,13 @@ UINT32 Target_current_ma; /* Subindex3 - target_current_ma */
 UINT16 Command; /* Subindex4 - command */
 } OBJ_STRUCT_PACKED_END
 TOBJ7000;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJ7000 ChargerRxPDO0x7000
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={4,0x0000,0x00000000,0x00000000,0x0000}
 #endif
 ;
@@ -400,7 +400,7 @@ OBJCONST UCHAR OBJMEM aName0xF000[] = "Modular Device Profile\000"
 "Maximum number of modules \000\377";
 #endif //#ifdef _OBJD_
 
-#ifndef _FOE_CHARGER_OBJECTS_H_
+#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 /**
 * \brief Object structure
 */
@@ -410,13 +410,13 @@ UINT16 IndexDistance; /* Subindex1 - Index distance  */
 UINT16 MaximumNumberOfModules; /* Subindex2 - Maximum number of modules  */
 } OBJ_STRUCT_PACKED_END
 TOBJF000;
-#endif //#ifndef _FOE_CHARGER_OBJECTS_H_
+#endif //#ifndef _ETHERCAT_CHARGER_OBJECTS_H_
 
 /**
 * \brief Object variable
 */
 PROTO TOBJF000 ModularDeviceProfile0xF000
-#if defined(_FOE_CHARGER_) && (_FOE_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
 ={2,0x0010,0}
 #endif
 ;
@@ -450,4 +450,4 @@ TOBJECT    OBJMEM ApplicationObjDic[] = {
 #undef PROTO
 
 /** @}*/
-#define _FOE_CHARGER_OBJECTS_H_
+#define _ETHERCAT_CHARGER_OBJECTS_H_
