@@ -15,8 +15,8 @@
 		</Groups>
 		<Devices>
 			<Device Physics="YY">
-				<Type ProductCode="#x00000002" RevisionNo="#x00000001">foe</Type>
-				<Name>foe</Name>
+				<Type ProductCode="#x00000002" RevisionNo="#x00000001">foe_charger</Type>
+				<Name>foe_charger</Name>
 				<Info>
 					<StateMachine>
 						<Timeout>
@@ -45,12 +45,12 @@
 					<Dictionary>
 						<DataTypes>
 							<DataType>
-								<Name>STRING(11)</Name>
-								<BitSize>88</BitSize>
-							</DataType>
-							<DataType>
 								<Name>STRING(3)</Name>
 								<BitSize>24</BitSize>
+							</DataType>
+							<DataType>
+								<Name>STRING(11)</Name>
+								<BitSize>88</BitSize>
 							</DataType>
 							<DataType>
 								<Name>USINT</Name>
@@ -162,7 +162,7 @@
 							</DataType>
 							<DataType>
 								<Name>DT1600</Name>
-								<BitSize>48</BitSize>
+								<BitSize>144</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -177,9 +177,42 @@
 									<SubIdx>1</SubIdx>
 									<Name>SubIndex 001</Name>
 									<Type>UDINT</Type>
-									<Comment>Reference to 0x7010.0</Comment>
+									<Comment>Reference to 0x7000.1</Comment>
 									<BitSize>32</BitSize>
 									<BitOffs>16</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>2</SubIdx>
+									<Name>SubIndex 002</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x7000.2</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>48</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>3</SubIdx>
+									<Name>SubIndex 003</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x7000.3</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>80</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>4</SubIdx>
+									<Name>SubIndex 004</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x7000.4</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>112</BitOffs>
 									<Flags>
 										<Access>ro</Access>
 									</Flags>
@@ -187,7 +220,7 @@
 							</DataType>
 							<DataType>
 								<Name>DT1A00</Name>
-								<BitSize>48</BitSize>
+								<BitSize>176</BitSize>
 								<SubItem>
 									<SubIdx>0</SubIdx>
 									<Name>SubIndex 000</Name>
@@ -202,9 +235,53 @@
 									<SubIdx>1</SubIdx>
 									<Name>SubIndex 001</Name>
 									<Type>UDINT</Type>
-									<Comment>Reference to 0x6000.0</Comment>
+									<Comment>Reference to 0x6000.1</Comment>
 									<BitSize>32</BitSize>
 									<BitOffs>16</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>2</SubIdx>
+									<Name>SubIndex 002</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x6000.2</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>48</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>3</SubIdx>
+									<Name>SubIndex 003</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x6000.3</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>80</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>4</SubIdx>
+									<Name>SubIndex 004</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x6000.4</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>112</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>5</SubIdx>
+									<Name>SubIndex 005</Name>
+									<Type>UDINT</Type>
+									<Comment>Reference to 0x6000.5</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>144</BitOffs>
 									<Flags>
 										<Access>ro</Access>
 									</Flags>
@@ -575,6 +652,142 @@
 								</SubItem>
 							</DataType>
 							<DataType>
+								<Name>DT6000</Name>
+								<BitSize>128</BitSize>
+								<SubItem>
+									<SubIdx>0</SubIdx>
+									<Name>SubIndex 000</Name>
+									<Type>USINT</Type>
+									<BitSize>8</BitSize>
+									<BitOffs>0</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>1</SubIdx>
+									<Name>status_word</Name>
+									<Type>UINT</Type>
+									<Comment>Charger status bits</Comment>
+									<BitSize>16</BitSize>
+									<BitOffs>16</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>2</SubIdx>
+									<Name>measured_voltage_mv</Name>
+									<Type>UDINT</Type>
+									<Comment>Measured output voltage in mV</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>32</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>3</SubIdx>
+									<Name>measured_current_ma</Name>
+									<Type>UDINT</Type>
+									<Comment>Measured output current in mA</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>64</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>4</SubIdx>
+									<Name>fault_code</Name>
+									<Type>UINT</Type>
+									<Comment>Active charger fault code</Comment>
+									<BitSize>16</BitSize>
+									<BitOffs>96</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>5</SubIdx>
+									<Name>ota_state</Name>
+									<Type>UINT</Type>
+									<Comment>OTA status reported by user application</Comment>
+									<BitSize>16</BitSize>
+									<BitOffs>112</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+										<PdoMapping>t</PdoMapping>
+									</Flags>
+								</SubItem>
+							</DataType>
+							<DataType>
+								<Name>DT7000</Name>
+								<BitSize>112</BitSize>
+								<SubItem>
+									<SubIdx>0</SubIdx>
+									<Name>SubIndex 000</Name>
+									<Type>USINT</Type>
+									<BitSize>8</BitSize>
+									<BitOffs>0</BitOffs>
+									<Flags>
+										<Access>ro</Access>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>1</SubIdx>
+									<Name>control_word</Name>
+									<Type>UINT</Type>
+									<Comment>Charger control word</Comment>
+									<BitSize>16</BitSize>
+									<BitOffs>16</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>2</SubIdx>
+									<Name>target_voltage_mv</Name>
+									<Type>UDINT</Type>
+									<Comment>Target output voltage in mV</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>32</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>3</SubIdx>
+									<Name>target_current_ma</Name>
+									<Type>UDINT</Type>
+									<Comment>Target output current in mA</Comment>
+									<BitSize>32</BitSize>
+									<BitOffs>64</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+								<SubItem>
+									<SubIdx>4</SubIdx>
+									<Name>command</Name>
+									<Type>UINT</Type>
+									<Comment>Charger command: 0 none, 1 enable, 2 disable, 3 clear fault</Comment>
+									<BitSize>16</BitSize>
+									<BitOffs>96</BitOffs>
+									<Flags>
+										<Access>rw</Access>
+										<PdoMapping>r</PdoMapping>
+									</Flags>
+								</SubItem>
+							</DataType>
+							<DataType>
 								<Name>DTF000</Name>
 								<BitSize>48</BitSize>
 								<SubItem>
@@ -637,10 +850,10 @@
 							<Object>
 								<Index>#x1008</Index>
 								<Name>Device name</Name>
-								<Type>STRING(3)</Type>
-								<BitSize>24</BitSize>
+								<Type>STRING(11)</Type>
+								<BitSize>88</BitSize>
 								<Info>
-									<DefaultData>666F65</DefaultData>
+									<DefaultData>666F655F63686172676572</DefaultData>
 								</Info>
 								<Flags>
 									<Access>ro</Access>
@@ -746,40 +959,82 @@
 							</Object>
 							<Object>
 								<Index>#x1600</Index>
-								<Name>OutputCounter process data mapping</Name>
+								<Name>Charger RxPDO process data mapping</Name>
 								<Type>DT1600</Type>
-								<BitSize>48</BitSize>
+								<BitSize>144</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>01</DefaultData>
+											<DefaultData>04</DefaultData>
 										</Info>
 									</SubItem>
 									<SubItem>
 										<Name>SubIndex 001</Name>
 										<Info>
-											<DefaultData>20001070</DefaultData>
+											<DefaultData>10010070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 002</Name>
+										<Info>
+											<DefaultData>20020070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 003</Name>
+										<Info>
+											<DefaultData>20030070</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 004</Name>
+										<Info>
+											<DefaultData>10040070</DefaultData>
 										</Info>
 									</SubItem>
 								</Info>
 							</Object>
 							<Object>
 								<Index>#x1A00</Index>
-								<Name>InputCounter process data mapping</Name>
+								<Name>Charger TxPDO process data mapping</Name>
 								<Type>DT1A00</Type>
-								<BitSize>48</BitSize>
+								<BitSize>176</BitSize>
 								<Info>
 									<SubItem>
 										<Name>SubIndex 000</Name>
 										<Info>
-											<DefaultData>01</DefaultData>
+											<DefaultData>05</DefaultData>
 										</Info>
 									</SubItem>
 									<SubItem>
 										<Name>SubIndex 001</Name>
 										<Info>
-											<DefaultData>20000060</DefaultData>
+											<DefaultData>10010060</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 002</Name>
+										<Info>
+											<DefaultData>20020060</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 003</Name>
+										<Info>
+											<DefaultData>20030060</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 004</Name>
+										<Info>
+											<DefaultData>10040060</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>SubIndex 005</Name>
+										<Info>
+											<DefaultData>10050060</DefaultData>
 										</Info>
 									</SubItem>
 								</Info>
@@ -928,29 +1183,85 @@
 							</Object>
 							<Object>
 								<Index>#x6000</Index>
-								<Name>InputCounter</Name>
-								<Type>UDINT</Type>
-								<BitSize>32</BitSize>
+								<Name>Charger TxPDO</Name>
+								<Type>DT6000</Type>
+								<BitSize>128</BitSize>
 								<Info>
-									<DefaultData>00000000</DefaultData>
+									<SubItem>
+										<Name>SubIndex 000</Name>
+										<Info>
+											<DefaultData>05</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>status_word</Name>
+										<Info>
+											<DefaultData>0000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>measured_voltage_mv</Name>
+										<Info>
+											<DefaultData>00000000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>measured_current_ma</Name>
+										<Info>
+											<DefaultData>00000000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>fault_code</Name>
+										<Info>
+											<DefaultData>0000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>ota_state</Name>
+										<Info>
+											<DefaultData>0000</DefaultData>
+										</Info>
+									</SubItem>
 								</Info>
-								<Flags>
-									<Access>ro</Access>
-									<PdoMapping>t</PdoMapping>
-								</Flags>
 							</Object>
 							<Object>
-								<Index>#x7010</Index>
-								<Name>OutputCounter</Name>
-								<Type>UDINT</Type>
-								<BitSize>32</BitSize>
+								<Index>#x7000</Index>
+								<Name>Charger RxPDO</Name>
+								<Type>DT7000</Type>
+								<BitSize>112</BitSize>
 								<Info>
-									<DefaultData>00000000</DefaultData>
+									<SubItem>
+										<Name>SubIndex 000</Name>
+										<Info>
+											<DefaultData>04</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>control_word</Name>
+										<Info>
+											<DefaultData>0000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>target_voltage_mv</Name>
+										<Info>
+											<DefaultData>00000000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>target_current_ma</Name>
+										<Info>
+											<DefaultData>00000000</DefaultData>
+										</Info>
+									</SubItem>
+									<SubItem>
+										<Name>command</Name>
+										<Info>
+											<DefaultData>0000</DefaultData>
+										</Info>
+									</SubItem>
 								</Info>
-								<Flags>
-									<Access>rw</Access>
-									<PdoMapping>r</PdoMapping>
-								</Flags>
 							</Object>
 							<Object>
 								<Index>#xF000</Index>
@@ -980,28 +1291,77 @@
 				<Fmmu>MBoxState</Fmmu>
 				<Sm MinSize="#x24" MaxSize="#x10C" DefaultSize="#x80" StartAddress="#x1000" ControlByte="#x26" Enable="1">MBoxOut</Sm>
 				<Sm MinSize="#x24" MaxSize="#x10C" DefaultSize="#x80" StartAddress="#x1080" ControlByte="#x22" Enable="1">MBoxIn</Sm>
-				<Sm DefaultSize="4" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
-				<Sm DefaultSize="4" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
+				<Sm DefaultSize="12" StartAddress="#x1100" ControlByte="#x64" Enable="1">Outputs</Sm>
+				<Sm DefaultSize="14" StartAddress="#x1400" ControlByte="#x20" Enable="1">Inputs</Sm>
 				<RxPdo Fixed="true" Mandatory="true" Sm="2">
 					<Index>#x1600</Index>
-					<Name>OutputCounter process data mapping</Name>
+					<Name>Charger RxPDO process data mapping</Name>
 					<Entry>
-						<Index>#x7010</Index>
-						<SubIndex>0</SubIndex>
+						<Index>#x7000</Index>
+						<SubIndex>1</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>control_word</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>2</SubIndex>
 						<BitLen>32</BitLen>
-						<Name>OutputCounter</Name>
+						<Name>target_voltage_mv</Name>
 						<DataType>UDINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>3</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>target_current_ma</Name>
+						<DataType>UDINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x7000</Index>
+						<SubIndex>4</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>command</Name>
+						<DataType>UINT</DataType>
 					</Entry>
 				</RxPdo>
 				<TxPdo Fixed="true" Mandatory="true" Sm="3">
 					<Index>#x1A00</Index>
-					<Name>InputCounter process data mapping</Name>
+					<Name>Charger TxPDO process data mapping</Name>
 					<Entry>
 						<Index>#x6000</Index>
-						<SubIndex>0</SubIndex>
+						<SubIndex>1</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>status_word</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x6000</Index>
+						<SubIndex>2</SubIndex>
 						<BitLen>32</BitLen>
-						<Name>InputCounter</Name>
+						<Name>measured_voltage_mv</Name>
 						<DataType>UDINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x6000</Index>
+						<SubIndex>3</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>measured_current_ma</Name>
+						<DataType>UDINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x6000</Index>
+						<SubIndex>4</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>fault_code</Name>
+						<DataType>UINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x6000</Index>
+						<SubIndex>5</SubIndex>
+						<BitLen>16</BitLen>
+						<Name>ota_state</Name>
+						<DataType>UINT</DataType>
 					</Entry>
 				</TxPdo>
 				<Mailbox DataLinkLayer="true">

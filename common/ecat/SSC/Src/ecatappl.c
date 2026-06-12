@@ -150,13 +150,10 @@ V4.00 APPL 6: The main function was split in MainInit and MainLoop
 #undef _APPL_INTERFACE_
 
 /*ECATCHANGE_START(V5.13) CIA402 3*/
-/*ECATCHANGE_END(V5.13) CIA402 3*/
-#include "cia402appl.h"
+#include "foe_charger.h"
 
-#include "eeprom.h"
-
-#undef SET_EEPROM_PTR
-
+#include "eeprom.h"
+#undef SET_EEPROM_PTR
 #define SET_EEPROM_PTR pEEPROM = aEepromData;
 
 
@@ -933,10 +930,6 @@ void MainLoop(void)
        COE_Main();
        CheckIfEcatError();
 
-       /*ECATCHANGE_START(V5.13) CIA402 4*/
-       /*decouple CIA402 state machine from ESM*/
-       /*ECATCHANGE_END(V5.13) CIA402 4*/
-        CiA402_StateMachine();
 
     if (pAPPL_MainLoop != NULL)
     {

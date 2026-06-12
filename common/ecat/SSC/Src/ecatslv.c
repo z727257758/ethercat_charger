@@ -219,8 +219,7 @@ V4.00 ECAT 7: The return values for the AL-StatusCode were changed to UINT16
 
 
 /*ECATCHANGE_START(V5.13) CIA402 3*/
-/*ECATCHANGE_END(V5.13) CIA402 3*/
-#include "cia402appl.h"
+#include "foe_charger.h"
 
 /*--------------------------------------------------------------------------------------
 ------
@@ -271,7 +270,6 @@ void ResetALEventMask(UINT16 intMask)
     UINT32 u32Mask = 0;
     HW_EscReadDWord(u32Mask, ESC_AL_EVENTMASK_OFFSET);
     u32Mask &= (UINT32)intMask;
-    u32Mask &= ~(SYNC0_EVENT | SYNC1_EVENT); /* mask Sync0\Sync1 for PDI IRQ, because there are independent Sync0\Sync1 IRQ */
 
 
 
@@ -292,7 +290,6 @@ void SetALEventMask(UINT16 intMask)
     UINT32 u32Mask = 0;
     HW_EscReadDWord(u32Mask, ESC_AL_EVENTMASK_OFFSET);
     u32Mask |= (UINT32)intMask;
-    u32Mask &= ~(SYNC0_EVENT | SYNC1_EVENT); /* mask Sync0\Sync1 for PDI IRQ, because there are independent Sync0\Sync1 IRQ */
 
 
     DISABLE_ESC_INT();

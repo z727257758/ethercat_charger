@@ -215,7 +215,7 @@ EL9800_APPLICATION: Should be set if the Slave Sample Code runs on an EL9800_x E
 /** 
 CiA402_SAMPLE_APPLICATION: If this switch is set, then the sample implementation of CiA402 device profile will be activated. */
 #ifndef CiA402_SAMPLE_APPLICATION
-#define CiA402_SAMPLE_APPLICATION                 1 //This define was already evaluated by ET9300 Project Handler(V. 1.5.3.0)!
+#define CiA402_SAMPLE_APPLICATION                 0 //This define was already evaluated by ET9300 Project Handler(V. 1.5.3.0)!
 #endif
 
 /** 
@@ -892,13 +892,13 @@ VENDOR_ID: Object 0x1018 SI1 (Vendor ID)	 <br>
 An unique EtherCAT Vendor ID is required. Please find all valid Vendor IDs listed at www.ethercat.org/en/vendor_id_list.html.<br>
 If your company is not listed, please assign an ID for free at www.ethercat.org/memberarea/vendor_id.asp */
 #ifndef VENDOR_ID
-#define VENDOR_ID                                 0x0048504D
+#define VENDOR_ID                                 0x1234
 #endif
 
 /** 
 PRODUCT_CODE: Object 0x1018 SI2 (EtherCAT product code) */
 #ifndef PRODUCT_CODE
-#define PRODUCT_CODE                              0x00000003
+#define PRODUCT_CODE                              0x00000002
 #endif
 
 /** 
@@ -916,13 +916,13 @@ SERIAL_NUMBER: Object 0x1018 SI4 (EtherCAT product serial number) */
 /** 
 DEVICE_PROFILE_TYPE: Slave device type (Object 0x1000)  */
 #ifndef DEVICE_PROFILE_TYPE
-#define DEVICE_PROFILE_TYPE                       402
+#define DEVICE_PROFILE_TYPE                       0x00001389
 #endif
 
 /** 
 DEVICE_NAME: Name of the slave device (Object 0x1008) */
 #ifndef DEVICE_NAME
-#define DEVICE_NAME                               "ECAT_CIA402"
+#define DEVICE_NAME                               "foe_charger"
 #endif
 
 /** 
