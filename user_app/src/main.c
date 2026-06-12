@@ -5,15 +5,15 @@
 #include "charger_app.h"
 #include "ecat_slave.h"
 #include "hpm_ota.h"
+#include "modbus_master_app.h"
 #include "oled.h"
 #include "task.h"
 
 #define ECAT_TASK_PRIORITY       (configMAX_PRIORITIES - 2)
 #define CHARGER_TASK_PRIORITY    (configMAX_PRIORITIES - 4)
+#define MODBUS_TASK_PRIORITY     (configMAX_PRIORITIES - 5)
 #define STATUS_TASK_PRIORITY     (configMAX_PRIORITIES - 6)
 #define OLED_TASK_PRIORITY       (configMAX_PRIORITIES - 7)
-
-static charger_rxpdo_t s_demo_rxpdo;
 
 static void ecat_task(void *pvParameters)
 {
@@ -35,11 +35,8 @@ static void charger_task(void *pvParameters)
     (void)pvParameters;
 
     charger_app_init();
-    s_demo_rxpdo.target_voltage_mv = 54000U;
-    s_demo_rxpdo.target_current_ma = 10000U;
 
     while (1) {
-        charger_app_set_rxpdo(&s_demo_rxpdo);
         charger_app_step();
         vTaskDelay(pdMS_TO_TICKS(10));
     }
@@ -124,6 +121,12 @@ int main(void)
                 configMINIMAL_STACK_SIZE,
                 NULL,
                 CHARGER_TASK_PRIORITY,
+                NULL);
+    xTaskCreate(modbus_master_task,
+                "modbus",
+                configMINIMAL_STACK_SIZE * 3,
+                NULL,
+                MODBUS_TASK_PRIORITY,
                 NULL);
     xTaskCreate(status_task,
                 "status",
