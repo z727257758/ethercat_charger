@@ -30,10 +30,10 @@ $openocdScripts = Join-Path $env:HPM_SDK_BASE "boards\openocd"
 $env:OPENOCD_SCRIPTS = $openocdScripts
 
 if ($BootElf -eq "") {
-    $BootElf = Join-Path $root "build\ninja\bootuser\output\demo.elf"
+    $BootElf = Join-Path $root "build\ninja\bootuser\output\ethercat_charger_bootuser.elf"
 }
 if ($UserElf -eq "") {
-    $UserElf = Join-Path $root "build\ninja\user_app\output\demo.elf"
+    $UserElf = Join-Path $root "build\ninja\user_app\output\ethercat_charger_user_app.elf"
 }
 
 if ($BoardCfg -eq "") {

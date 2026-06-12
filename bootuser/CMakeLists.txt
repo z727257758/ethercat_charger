@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(APP_VERSION_STRING "\"1.10.0\"")
+set(APP_NAME ethercat_charger_bootuser)
 set(INCLUDE_BOOTHEADER 1)
 set(CONFIG_USE_FLASH_1M 1)
 set(CONFIG_MBEDTLS 1)

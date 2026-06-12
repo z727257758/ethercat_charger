@@ -21,8 +21,8 @@ The project uses the local board package under `boards/hpm5e31_LuckyCAT` and imp
 
 This builds:
 
-- `build\bootuser\output\demo.bin`
-- `build\user_app\output\demo.bin`
+- `build\ninja\bootuser\output\ethercat_charger_bootuser.bin`
+- `build\ninja\user_app\output\ethercat_charger_user_app.bin`
 
 ## Flash Layout
 
@@ -46,4 +46,3 @@ TwinCAT FoE settings:
 - Download file: `update_sign.bin`
 
 After FoE download, leave Bootstrap mode to reset and boot the updated image.
-

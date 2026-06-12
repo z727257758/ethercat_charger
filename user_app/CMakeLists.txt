@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(APP_VERSION_STRING "\"1.10.0\"")
+set(APP_NAME ethercat_charger_user_app)
 set(CONFIG_FREERTOS 1)
 set(CONFIG_FREERTOS_TIMER_RESOURCE_GPTMR 1)
 set(CONFIG_EEPROM_EMULATION 1)
