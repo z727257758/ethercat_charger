@@ -33,27 +33,28 @@
 #define MODBUS_RESPONSE_TIMEOUT_MS     (300U)
 #define MODBUS_FRAME_GAP_MS            (10U)
 #define MODBUS_RX_BUFFER_SIZE          (256U)
-#define MODBUS_REGISTER_COUNT          (14U)
-#define MODBUS_TX_REG_COUNT            (3U)
+#define MODBUS_CONTROL_REG_COUNT       (4U)
+#define MODBUS_FEEDBACK_REG_COUNT      (4U)
 #define MODBUS_RX_MIN_LEN              (5U)
 
-#define MODBUS_REG_TARGET_VOLTAGE      (0U)
-#define MODBUS_REG_TARGET_CURRENT      (1U)
-#define MODBUS_REG_COMMAND             (2U)
+#define MODBUS_REG_CONTROL_WORD        (0U)
+#define MODBUS_REG_TARGET_VOLTAGE      (1U)
+#define MODBUS_REG_TARGET_CURRENT      (2U)
+#define MODBUS_REG_COMMAND             (3U)
 #define MODBUS_REG_MEASURED_VOLTAGE    (10U)
 #define MODBUS_REG_MEASURED_CURRENT    (11U)
 #define MODBUS_REG_STATUS_WORD         (12U)
 #define MODBUS_REG_FAULT_CODE          (13U)
 
 typedef enum {
-    modbus_state_send_read = 0,
-    modbus_state_wait_read_tx_done,
-    modbus_state_wait_read_response,
-    modbus_state_process_read_response,
-    modbus_state_send_write,
-    modbus_state_wait_write_tx_done,
-    modbus_state_wait_write_response,
-    modbus_state_process_write_response,
+    modbus_state_send_control = 0,
+    modbus_state_wait_control_tx_done,
+    modbus_state_wait_control_response,
+    modbus_state_process_control_response,
+    modbus_state_send_feedback_read,
+    modbus_state_wait_feedback_tx_done,
+    modbus_state_wait_feedback_response,
+    modbus_state_process_feedback_response,
     modbus_state_poll_delay,
 } modbus_state_t;
 
@@ -69,8 +70,8 @@ static ATTR_PLACE_AT_NONCACHEABLE_BSS_WITH_ALIGNMENT(4) uint8_t s_uart_rx_buf[MO
 static ATTR_PLACE_AT_NONCACHEABLE_BSS_WITH_ALIGNMENT(8) dma_linked_descriptor_t s_rx_descriptors[2];
 static volatile ATTR_PLACE_AT_NONCACHEABLE modbus_rx_cursor_t s_rx_cursor;
 static volatile bool s_tx_busy;
-static charger_rxpdo_t s_modbus_rxpdo;
-static uint16_t s_hold_registers[MODBUS_REGISTER_COUNT];
+static uint16_t s_control_registers[MODBUS_CONTROL_REG_COUNT];
+static uint16_t s_feedback_registers[MODBUS_FEEDBACK_REG_COUNT];
 
 static void modbus_uart_dma_init(void);
 
@@ -236,31 +237,35 @@ static void modbus_uart_dma_init(void)
     dma_setup_handshake(MODBUS_UART_DMA_CONTROLLER, &tx_ch_config, false);
 }
 
-static void modbus_apply_target_registers(const uint16_t *registers)
+static void modbus_update_control_registers(void)
 {
-    s_modbus_rxpdo.target_voltage_mv = (uint32_t)registers[MODBUS_REG_TARGET_VOLTAGE] * 100U;
-    s_modbus_rxpdo.target_current_ma = (uint32_t)registers[MODBUS_REG_TARGET_CURRENT] * 10U;
-    s_modbus_rxpdo.command = registers[MODBUS_REG_COMMAND];
-    charger_app_set_rxpdo(&s_modbus_rxpdo);
+    charger_rxpdo_t rxpdo;
+
+    charger_app_get_rxpdo(&rxpdo);
+    s_control_registers[MODBUS_REG_CONTROL_WORD] = rxpdo.control_word;
+    s_control_registers[MODBUS_REG_TARGET_VOLTAGE] = (uint16_t)(rxpdo.target_voltage_mv / 100U);
+    s_control_registers[MODBUS_REG_TARGET_CURRENT] = (uint16_t)(rxpdo.target_current_ma / 10U);
+    s_control_registers[MODBUS_REG_COMMAND] = rxpdo.command;
 }
 
-static void modbus_update_status_registers(void)
+static void modbus_apply_feedback_registers(const uint16_t *registers)
 {
     charger_txpdo_t txpdo;
 
-    charger_app_get_txpdo(&txpdo);
-    s_hold_registers[MODBUS_REG_MEASURED_VOLTAGE] = (uint16_t)(txpdo.measured_voltage_mv / 100U);
-    s_hold_registers[MODBUS_REG_MEASURED_CURRENT] = (uint16_t)(txpdo.measured_current_ma / 10U);
-    s_hold_registers[MODBUS_REG_STATUS_WORD] = txpdo.status_word;
-    s_hold_registers[MODBUS_REG_FAULT_CODE] = txpdo.fault_code;
+    memset(&txpdo, 0, sizeof(txpdo));
+    txpdo.measured_voltage_mv = (uint32_t)registers[0] * 100U;
+    txpdo.measured_current_ma = (uint32_t)registers[1] * 10U;
+    txpdo.status_word = registers[2];
+    txpdo.fault_code = registers[3];
+    charger_app_set_modbus_feedback(&txpdo);
 }
 
 void modbus_master_init(void)
 {
     agile_modbus_t *ctx = &s_modbus_rtu._ctx;
 
-    memset(&s_modbus_rxpdo, 0, sizeof(s_modbus_rxpdo));
-    memset(s_hold_registers, 0, sizeof(s_hold_registers));
+    memset(s_control_registers, 0, sizeof(s_control_registers));
+    memset(s_feedback_registers, 0, sizeof(s_feedback_registers));
 
     modbus_uart_init();
     agile_modbus_rtu_init(&s_modbus_rtu,
@@ -277,7 +282,7 @@ void modbus_master_task(void *pvParameters)
     agile_modbus_t *ctx = &s_modbus_rtu._ctx;
     TickType_t last_wake = xTaskGetTickCount();
     TickType_t state_start = last_wake;
-    modbus_state_t state = modbus_state_send_read;
+    modbus_state_t state = modbus_state_send_control;
     int read_len = 0;
 
     (void)pvParameters;
@@ -288,96 +293,99 @@ void modbus_master_task(void *pvParameters)
         TickType_t now = xTaskGetTickCount();
 
         switch (state) {
-        case modbus_state_send_read: {
+        case modbus_state_send_control: {
             int send_len;
             modbus_uart_flush();
-            send_len = agile_modbus_serialize_read_registers(ctx, 0, MODBUS_REGISTER_COUNT);
-            if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
-                printf("modbus read send failed\r\n");
-                state = modbus_state_poll_delay;
-            } else {
-                state = modbus_state_wait_read_tx_done;
-            }
-            state_start = now;
-            break;
-        }
-        case modbus_state_wait_read_tx_done:
-            if (modbus_uart_send_finish()) {
-                state = modbus_state_wait_read_response;
-                state_start = now;
-            } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus read tx timeout\r\n");
-                state = modbus_state_poll_delay;
-                state_start = now;
-            }
-            break;
-        case modbus_state_wait_read_response:
-            read_len = modbus_uart_receive(ctx->read_buf, ctx->read_bufsz);
-            if (read_len >= MODBUS_RX_MIN_LEN) {
-                if (modbus_uart_available() == 0U) {
-                    state = modbus_state_process_read_response;
-                }
-            } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus read timeout\r\n");
-                state = modbus_state_poll_delay;
-                state_start = now;
-            }
-            break;
-        case modbus_state_process_read_response: {
-            int rc = agile_modbus_deserialize_read_registers(ctx, read_len, s_hold_registers);
-            if (rc < 0) {
-                printf("modbus read parse failed rc:%d len:%d\r\n", rc, read_len);
-                state = modbus_state_poll_delay;
-            } else {
-                modbus_apply_target_registers(s_hold_registers);
-                modbus_update_status_registers();
-                state = modbus_state_send_write;
-            }
-            state_start = now;
-            break;
-        }
-        case modbus_state_send_write: {
-            int send_len;
-            modbus_uart_flush();
+            modbus_update_control_registers();
             send_len = agile_modbus_serialize_write_registers(ctx,
-                                                              MODBUS_REG_MEASURED_VOLTAGE,
-                                                              MODBUS_TX_REG_COUNT,
-                                                              &s_hold_registers[MODBUS_REG_MEASURED_VOLTAGE]);
+                                                              MODBUS_REG_CONTROL_WORD,
+                                                              MODBUS_CONTROL_REG_COUNT,
+                                                              s_control_registers);
             if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
-                printf("modbus write send failed\r\n");
+                printf("modbus control send failed\r\n");
                 state = modbus_state_poll_delay;
             } else {
-                state = modbus_state_wait_write_tx_done;
+                state = modbus_state_wait_control_tx_done;
             }
             state_start = now;
             break;
         }
-        case modbus_state_wait_write_tx_done:
+        case modbus_state_wait_control_tx_done:
             if (modbus_uart_send_finish()) {
-                state = modbus_state_wait_write_response;
+                state = modbus_state_wait_control_response;
                 state_start = now;
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus write tx timeout\r\n");
+                printf("modbus control tx timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
             break;
-        case modbus_state_wait_write_response:
+        case modbus_state_wait_control_response:
             read_len = modbus_uart_receive(ctx->read_buf, ctx->read_bufsz);
             if (read_len >= MODBUS_RX_MIN_LEN) {
                 if (modbus_uart_available() == 0U) {
-                    state = modbus_state_process_write_response;
+                    state = modbus_state_process_control_response;
                 }
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus write timeout\r\n");
+                printf("modbus control timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
             break;
-        case modbus_state_process_write_response: {
+        case modbus_state_process_control_response: {
             int rc = agile_modbus_deserialize_write_registers(ctx, read_len);
             if (rc < 0) {
-                printf("modbus write parse failed rc:%d len:%d\r\n", rc, read_len);
+                printf("modbus control parse failed rc:%d len:%d\r\n", rc, read_len);
+                state = modbus_state_poll_delay;
+            } else {
+                state = modbus_state_send_feedback_read;
+            }
+            state_start = now;
+            break;
+        }
+        case modbus_state_send_feedback_read: {
+            int send_len;
+            modbus_uart_flush();
+            send_len = agile_modbus_serialize_read_registers(ctx,
+                                                              MODBUS_REG_MEASURED_VOLTAGE,
+                                                              MODBUS_FEEDBACK_REG_COUNT);
+            if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
+                printf("modbus feedback read send failed\r\n");
+                state = modbus_state_poll_delay;
+            } else {
+                state = modbus_state_wait_feedback_tx_done;
+            }
+            state_start = now;
+            break;
+        }
+        case modbus_state_wait_feedback_tx_done:
+            if (modbus_uart_send_finish()) {
+                state = modbus_state_wait_feedback_response;
+                state_start = now;
+            } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
+                printf("modbus feedback tx timeout\r\n");
+                state = modbus_state_poll_delay;
+                state_start = now;
+            }
+            break;
+        case modbus_state_wait_feedback_response:
+            read_len = modbus_uart_receive(ctx->read_buf, ctx->read_bufsz);
+            if (read_len >= MODBUS_RX_MIN_LEN) {
+                if (modbus_uart_available() == 0U) {
+                    state = modbus_state_process_feedback_response;
+                }
+            } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
+                printf("modbus feedback timeout\r\n");
+                state = modbus_state_poll_delay;
+                state_start = now;
+            }
+            break;
+        case modbus_state_process_feedback_response: {
+            int rc = agile_modbus_deserialize_read_registers(ctx, read_len, s_feedback_registers);
+            if (rc < 0) {
+                printf("modbus feedback parse failed rc:%d len:%d\r\n", rc, read_len);
+            } else {
+                modbus_apply_feedback_registers(s_feedback_registers);
             }
             state = modbus_state_poll_delay;
             state_start = now;
@@ -386,7 +394,7 @@ void modbus_master_task(void *pvParameters)
         case modbus_state_poll_delay:
         default:
             if ((now - state_start) >= pdMS_TO_TICKS(MODBUS_POLL_PERIOD_MS)) {
-                state = modbus_state_send_read;
+                state = modbus_state_send_control;
                 state_start = now;
             }
             break;

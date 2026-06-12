@@ -45,4 +45,5 @@ sdk_app_src(modbus/modbus_master_app.c)
 sdk_app_src(oled/oled.c)
 
 add_subdirectory($ENV{HPM_APP_BASE}/middleware/hpm_ota hpm_ota_build)
+add_subdirectory($ENV{HPM_SDK_BASE}/middleware/agile_modbus agile_modbus_build)
 include(${CMAKE_CURRENT_SOURCE_DIR}/ecat_sources.cmake)

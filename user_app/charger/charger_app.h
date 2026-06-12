@@ -39,6 +39,8 @@ typedef struct {
 void charger_app_init(void);
 void charger_app_step(void);
 void charger_app_set_rxpdo(const charger_rxpdo_t *rxpdo);
+void charger_app_get_rxpdo(charger_rxpdo_t *rxpdo);
+void charger_app_set_modbus_feedback(const charger_txpdo_t *txpdo);
 void charger_app_get_txpdo(charger_txpdo_t *txpdo);
 charger_state_t charger_app_get_state(void);
 
@@ -47,4 +49,3 @@ charger_state_t charger_app_get_state(void);
 #endif
 
 #endif
-
