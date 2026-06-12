@@ -31,10 +31,10 @@ sdk_compile_definitions(-D__ENABLE_FREERTOS=1)
 
 sdk_inc(inc)
 sdk_inc(../common)
-sdk_inc(../common/charger)
+sdk_inc(charger)
 
 sdk_app_src(src/main.c)
-sdk_app_src(../common/charger/charger_app.c)
+sdk_app_src(charger/charger_app.c)
 
 add_subdirectory($ENV{HPM_APP_BASE}/middleware/hpm_ota hpm_ota_build)
-include(${CMAKE_CURRENT_SOURCE_DIR}/../common/ecat_sources.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/ecat_sources.cmake)
