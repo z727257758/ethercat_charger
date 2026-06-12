@@ -5,11 +5,13 @@
 #include "charger_app.h"
 #include "ecat_slave.h"
 #include "hpm_ota.h"
+#include "oled.h"
 #include "task.h"
 
 #define ECAT_TASK_PRIORITY       (configMAX_PRIORITIES - 2)
 #define CHARGER_TASK_PRIORITY    (configMAX_PRIORITIES - 4)
 #define STATUS_TASK_PRIORITY     (configMAX_PRIORITIES - 6)
+#define OLED_TASK_PRIORITY       (configMAX_PRIORITIES - 7)
 
 static charger_rxpdo_t s_demo_rxpdo;
 
@@ -62,6 +64,48 @@ static void status_task(void *pvParameters)
     }
 }
 
+static void oled_show_line(uint8_t y, const char *text)
+{
+    OLED_ShowString(0, y, (uint8_t *)text, 8, 1);
+}
+
+static void oled_task(void *pvParameters)
+{
+    charger_txpdo_t txpdo;
+    char line[24];
+
+    (void)pvParameters;
+
+    OLED_Init();
+    OLED_Clear();
+    oled_show_line(0, "EtherCAT Charger");
+    OLED_Refresh();
+
+    while (1) {
+        charger_app_get_txpdo(&txpdo);
+
+        OLED_Clear();
+        oled_show_line(0, "EtherCAT Charger");
+
+        snprintf(line, sizeof(line), "State:%u OTA:%d",
+                 (unsigned int)charger_app_get_state(),
+                 hpm_ota_get_nowrunning_app());
+        oled_show_line(16, line);
+
+        snprintf(line, sizeof(line), "V:%lumV",
+                 (unsigned long)txpdo.measured_voltage_mv);
+        oled_show_line(32, line);
+
+        snprintf(line, sizeof(line), "I:%lumA F:%u",
+                 (unsigned long)txpdo.measured_current_ma,
+                 (unsigned int)txpdo.fault_code);
+        oled_show_line(48, line);
+
+        OLED_Refresh();
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
+}
+
 int main(void)
 {
     board_init();
@@ -86,6 +130,12 @@ int main(void)
                 configMINIMAL_STACK_SIZE,
                 NULL,
                 STATUS_TASK_PRIORITY,
+                NULL);
+    xTaskCreate(oled_task,
+                "oled",
+                configMINIMAL_STACK_SIZE * 2,
+                NULL,
+                OLED_TASK_PRIORITY,
                 NULL);
 
     vTaskStartScheduler();
