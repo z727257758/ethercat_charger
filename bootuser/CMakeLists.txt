@@ -26,5 +26,3 @@ sdk_inc(../common)
 sdk_app_src(src/boot_user.c)
 
 add_subdirectory($ENV{HPM_APP_BASE}/middleware/hpm_ota hpm_ota_build)
-
-generate_ide_projects()

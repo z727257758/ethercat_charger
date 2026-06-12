@@ -4,12 +4,12 @@
 */
 
 /**
-\addtogroup ethercat_charger ethercat_charger
+\addtogroup ethercat_charger_objects ethercat_charger_objects
 @{
 */
 
 /**
-\file ethercat_charger.c
+\file ethercat_charger_objects.c
 \brief Implementation
  Created with SSC Tool application parser 1.6.4.0
 \version 0.0.0.1
@@ -26,9 +26,9 @@
 #include "applInterface.h"
 #include "charger_app.h"
 
-#define _ETHERCAT_CHARGER_ 1
-#include "ethercat_charger.h"
-#undef _ETHERCAT_CHARGER_
+#define _ETHERCAT_CHARGER_OBJECTS_ 1
+#include "ethercat_charger_objects.h"
+#undef _ETHERCAT_CHARGER_OBJECTS_
 
 typedef struct __attribute__((packed)) {
     UINT16 status_word;

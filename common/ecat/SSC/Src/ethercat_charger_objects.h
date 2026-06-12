@@ -4,20 +4,20 @@
 */
 
 /**
- * \addtogroup ethercat_charger ethercat_charger
+ * \addtogroup ethercat_charger_objects ethercat_charger_objects
  * @{
  */
 
 /**
-\file ethercat_charger.h
-\brief ethercat_charger function prototypes and defines
+\file ethercat_charger_objects.h
+\brief ethercat_charger_objects function prototypes and defines
 
 \version 1.0.0.11
  */
 
  
- #ifndef _ETHERCAT_CHARGER_H_
-#define _ETHERCAT_CHARGER_H_
+ #ifndef _ETHERCAT_CHARGER_OBJECTS_H_
+#define _ETHERCAT_CHARGER_OBJECTS_H_
 
 
 /*-----------------------------------------------------------------------------------------
@@ -35,13 +35,13 @@
 ------
 -----------------------------------------------------------------------------------------*/
 
-#endif //_ETHERCAT_CHARGER_H_
+#endif //_ETHERCAT_CHARGER_OBJECTS_H_
 
 //include custom application object dictionary 
-#include "ethercat_chargerObjects.h"
+#include "ethercat_charger_objectsObjects.h"
 
 
-#if defined(_ETHERCAT_CHARGER_) && (_ETHERCAT_CHARGER_ == 1)
+#if defined(_ETHERCAT_CHARGER_OBJECTS_) && (_ETHERCAT_CHARGER_OBJECTS_ == 1)
     #define PROTO
 #else
     #define PROTO extern

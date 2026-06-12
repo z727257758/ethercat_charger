@@ -38,5 +38,3 @@ sdk_app_src(../common/charger/charger_app.c)
 
 add_subdirectory($ENV{HPM_APP_BASE}/middleware/hpm_ota hpm_ota_build)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../common/ecat_sources.cmake)
-
-generate_ide_projects()
