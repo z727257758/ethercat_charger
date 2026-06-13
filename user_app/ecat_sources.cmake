@@ -4,7 +4,7 @@ sdk_inc(${CMAKE_CURRENT_LIST_DIR}/ecat)
 sdk_inc(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src)
 
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/bootmode.c)
-sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/ethercat_charger_objects.c)
+sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/ethercat_charger.c)
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/coeappl.c)
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/ecatappl.c)
 sdk_src(${CMAKE_CURRENT_LIST_DIR}/ecat/SSC/Src/ecatcoe.c)

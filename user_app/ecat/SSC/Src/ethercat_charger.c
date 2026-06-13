@@ -24,10 +24,28 @@
 #include "ecat_def.h"
 
 #include "applInterface.h"
+#include "charger_app.h"
 
 #define _ETHERCAT_CHARGER_ 1
 #include "ethercat_charger.h"
 #undef _ETHERCAT_CHARGER_
+
+typedef struct __attribute__((packed)) {
+    UINT16 status_word;
+    UINT16 battery_level_x100;
+    UINT16 sys_input_voltage_mv;
+    UINT16 battery_voltage_mv;
+    UINT16 charge_current_ma;
+    UINT16 discharge_current_ma;
+    UINT16 internal_resistance_mohm;
+} charger_txpdo_wire_t;
+
+typedef struct __attribute__((packed)) {
+    UINT16 control_word;
+} charger_rxpdo_wire_t;
+
+_Static_assert(SIZEOF(charger_rxpdo_wire_t) == 2U, "RxPDO wire size must be 2 bytes");
+_Static_assert(SIZEOF(charger_txpdo_wire_t) == 14U, "TxPDO wire size must be 14 bytes");
 /*--------------------------------------------------------------------------------------
 ------
 ------    local types and defines
@@ -269,11 +287,28 @@ UINT16 APPL_GenerateMapping(UINT16 *pInputSize,UINT16 *pOutputSize)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_InputMapping(UINT16* pData)
 {
-#if _WIN32
-   #pragma message ("Warning: Implement input (Slave->Master) mapping")
-#else
-    #warning "Implement input (Slave->Master) mapping"
-#endif
+    charger_txpdo_t txpdo;
+    charger_txpdo_wire_t wire;
+
+    charger_app_get_txpdo(&txpdo);
+
+    ChargerTxPDO0x6000.Status_word = txpdo.status_word;
+    ChargerTxPDO0x6000.Battery_level_x100 = txpdo.battery_level_x100;
+    ChargerTxPDO0x6000.Sys_input_voltage_mv = txpdo.sys_input_voltage_mv;
+    ChargerTxPDO0x6000.Battery_voltage_mv = txpdo.battery_voltage_mv;
+    ChargerTxPDO0x6000.Charge_current_ma = txpdo.charge_current_ma;
+    ChargerTxPDO0x6000.Discharge_current_ma = txpdo.discharge_current_ma;
+    ChargerTxPDO0x6000.Internal_resistance_mohm = txpdo.internal_resistance_mohm;
+
+    wire.status_word = txpdo.status_word;
+    wire.battery_level_x100 = txpdo.battery_level_x100;
+    wire.sys_input_voltage_mv = txpdo.sys_input_voltage_mv;
+    wire.battery_voltage_mv = txpdo.battery_voltage_mv;
+    wire.charge_current_ma = txpdo.charge_current_ma;
+    wire.discharge_current_ma = txpdo.discharge_current_ma;
+    wire.internal_resistance_mohm = txpdo.internal_resistance_mohm;
+
+    MEMCPY(pData, &wire, SIZEOF(wire));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -285,11 +320,14 @@ void APPL_InputMapping(UINT16* pData)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_OutputMapping(UINT16* pData)
 {
-#if _WIN32
-   #pragma message ("Warning: Implement output (Master->Slave) mapping")
-#else
-    #warning "Implement output (Master->Slave) mapping"
-#endif
+    charger_rxpdo_t rxpdo;
+    charger_rxpdo_wire_t wire;
+
+    MEMCPY(&wire, pData, SIZEOF(wire));
+
+    ChargerRxPDO0x7000.Control_word = wire.control_word;
+    rxpdo.control_word = wire.control_word;
+    charger_app_set_rxpdo(&rxpdo);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -299,11 +337,10 @@ void APPL_OutputMapping(UINT16* pData)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_Application(void)
 {
-#if _WIN32
-   #pragma message ("Warning: Implement the slave application")
-#else
-    #warning "Implement the slave application"
-#endif
+    charger_rxpdo_t rxpdo;
+
+    rxpdo.control_word = ChargerRxPDO0x7000.Control_word;
+    charger_app_set_rxpdo(&rxpdo);
 }
 
 #if EXPLICIT_DEVICE_ID

@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "board.h"
 #include "applInterface.h"
+#include "ethercat_charger.h"
 #include "hpm_ecat_hw.h"
 #include "hpm_ecat_foe.h"
 #include "hpm_flash.h"

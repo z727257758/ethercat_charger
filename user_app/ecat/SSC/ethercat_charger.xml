@@ -15,7 +15,7 @@
 		</Groups>
 		<Devices>
 			<Device Physics="YY">
-				<Type ProductCode="#x00000002" RevisionNo="#x00000001">ethercat_charger</Type>
+				<Type ProductCode="#x00000002" RevisionNo="#x00000002">ethercat_charger</Type>
 				<Name>ethercat_charger</Name>
 				<Info>
 					<StateMachine>
@@ -891,7 +891,7 @@
 									<SubItem>
 										<Name>Revision Number</Name>
 										<Info>
-											<DefaultData>01000000</DefaultData>
+											<DefaultData>02000000</DefaultData>
 										</Info>
 									</SubItem>
 									<SubItem>
