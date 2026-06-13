@@ -4,12 +4,12 @@
 */
 
 /**
-\addtogroup ethercat_charger_objects ethercat_charger_objects
+\addtogroup ethercat_charger ethercat_charger
 @{
 */
 
 /**
-\file ethercat_charger_objects.c
+\file ethercat_charger.c
 \brief Implementation
  Created with SSC Tool application parser 1.6.4.0
 \version 0.0.0.1
@@ -24,26 +24,10 @@
 #include "ecat_def.h"
 
 #include "applInterface.h"
-#include "charger_app.h"
 
-#define _ETHERCAT_CHARGER_OBJECTS_ 1
-#include "ethercat_charger_objects.h"
-#undef _ETHERCAT_CHARGER_OBJECTS_
-
-typedef struct __attribute__((packed)) {
-    UINT16 status_word;
-    UINT32 measured_voltage_mv;
-    UINT32 measured_current_ma;
-    UINT16 fault_code;
-    UINT16 ota_state;
-} charger_txpdo_wire_t;
-
-typedef struct __attribute__((packed)) {
-    UINT16 control_word;
-    UINT32 target_voltage_mv;
-    UINT32 target_current_ma;
-    UINT16 command;
-} charger_rxpdo_wire_t;
+#define _ETHERCAT_CHARGER_ 1
+#include "ethercat_charger.h"
+#undef _ETHERCAT_CHARGER_
 /*--------------------------------------------------------------------------------------
 ------
 ------    local types and defines
@@ -285,24 +269,11 @@ UINT16 APPL_GenerateMapping(UINT16 *pInputSize,UINT16 *pOutputSize)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_InputMapping(UINT16* pData)
 {
-    charger_txpdo_t txpdo;
-    charger_txpdo_wire_t wire;
-
-    charger_app_get_txpdo(&txpdo);
-
-    ChargerTxPDO0x6000.Status_word = txpdo.status_word;
-    ChargerTxPDO0x6000.Measured_voltage_mv = txpdo.measured_voltage_mv;
-    ChargerTxPDO0x6000.Measured_current_ma = txpdo.measured_current_ma;
-    ChargerTxPDO0x6000.Fault_code = txpdo.fault_code;
-    ChargerTxPDO0x6000.Ota_state = txpdo.ota_state;
-
-    wire.status_word = txpdo.status_word;
-    wire.measured_voltage_mv = txpdo.measured_voltage_mv;
-    wire.measured_current_ma = txpdo.measured_current_ma;
-    wire.fault_code = txpdo.fault_code;
-    wire.ota_state = txpdo.ota_state;
-
-    MEMCPY(pData, &wire, SIZEOF(wire));
+#if _WIN32
+   #pragma message ("Warning: Implement input (Slave->Master) mapping")
+#else
+    #warning "Implement input (Slave->Master) mapping"
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -314,22 +285,11 @@ void APPL_InputMapping(UINT16* pData)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_OutputMapping(UINT16* pData)
 {
-    charger_rxpdo_t rxpdo;
-    charger_rxpdo_wire_t wire;
-
-    MEMCPY(&wire, pData, SIZEOF(wire));
-
-    ChargerRxPDO0x7000.Control_word = wire.control_word;
-    ChargerRxPDO0x7000.Target_voltage_mv = wire.target_voltage_mv;
-    ChargerRxPDO0x7000.Target_current_ma = wire.target_current_ma;
-    ChargerRxPDO0x7000.Command = wire.command;
-
-    rxpdo.control_word = wire.control_word;
-    rxpdo.target_voltage_mv = wire.target_voltage_mv;
-    rxpdo.target_current_ma = wire.target_current_ma;
-    rxpdo.command = wire.command;
-
-    charger_app_set_rxpdo(&rxpdo);
+#if _WIN32
+   #pragma message ("Warning: Implement output (Master->Slave) mapping")
+#else
+    #warning "Implement output (Master->Slave) mapping"
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -339,14 +299,11 @@ void APPL_OutputMapping(UINT16* pData)
 *////////////////////////////////////////////////////////////////////////////////////////
 void APPL_Application(void)
 {
-    charger_rxpdo_t rxpdo;
-
-    rxpdo.control_word = ChargerRxPDO0x7000.Control_word;
-    rxpdo.target_voltage_mv = ChargerRxPDO0x7000.Target_voltage_mv;
-    rxpdo.target_current_ma = ChargerRxPDO0x7000.Target_current_ma;
-    rxpdo.command = ChargerRxPDO0x7000.Command;
-
-    charger_app_set_rxpdo(&rxpdo);
+#if _WIN32
+   #pragma message ("Warning: Implement the slave application")
+#else
+    #warning "Implement the slave application"
+#endif
 }
 
 #if EXPLICIT_DEVICE_ID

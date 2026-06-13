@@ -10,7 +10,6 @@
 #include "task.h"
 
 #define ECAT_TASK_PRIORITY       (configMAX_PRIORITIES - 2)
-#define CHARGER_TASK_PRIORITY    (configMAX_PRIORITIES - 4)
 #define MODBUS_TASK_PRIORITY     (configMAX_PRIORITIES - 5)
 #define STATUS_TASK_PRIORITY     (configMAX_PRIORITIES - 6)
 #define OLED_TASK_PRIORITY       (configMAX_PRIORITIES - 7)
@@ -30,18 +29,6 @@ static void ecat_task(void *pvParameters)
     }
 }
 
-static void charger_task(void *pvParameters)
-{
-    (void)pvParameters;
-
-    charger_app_init();
-
-    while (1) {
-        charger_app_step();
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
-}
-
 static void status_task(void *pvParameters)
 {
     TickType_t last_wake = xTaskGetTickCount();
@@ -52,10 +39,14 @@ static void status_task(void *pvParameters)
     while (1) {
         charger_app_get_txpdo(&txpdo);
         board_led_toggle();
-        printf("charger state:%d status:0x%04x fault:%u ota_app:%d\r\n",
-               charger_app_get_state(),
+        printf("status:0x%04x soc:%u sys:%umV bat:%umV charge:%umA discharge:%umA resistance:%umOhm ota_app:%d\r\n",
                txpdo.status_word,
-               txpdo.fault_code,
+               txpdo.battery_level_x100,
+               txpdo.sys_input_voltage_mv,
+               txpdo.battery_voltage_mv,
+               txpdo.charge_current_ma,
+               txpdo.discharge_current_ma,
+               txpdo.internal_resistance_mohm,
                hpm_ota_get_nowrunning_app());
         vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(1000));
     }
@@ -84,18 +75,20 @@ static void oled_task(void *pvParameters)
         OLED_ClearBuffer();
         oled_show_line(0, "EtherCAT Charger");
 
-        snprintf(line, sizeof(line), "State:%u OTA:%d",
-                 (unsigned int)charger_app_get_state(),
-                 hpm_ota_get_nowrunning_app());
+        snprintf(line, sizeof(line), "S:%04X SOC:%u",
+                 (unsigned int)txpdo.status_word,
+                 (unsigned int)txpdo.battery_level_x100);
         oled_show_line(16, line);
 
-        snprintf(line, sizeof(line), "V:%lumV",
-                 (unsigned long)txpdo.measured_voltage_mv);
+        snprintf(line, sizeof(line), "SYS:%u BAT:%u",
+                 (unsigned int)txpdo.sys_input_voltage_mv,
+                 (unsigned int)txpdo.battery_voltage_mv);
         oled_show_line(32, line);
 
-        snprintf(line, sizeof(line), "I:%lumA F:%u",
-                 (unsigned long)txpdo.measured_current_ma,
-                 (unsigned int)txpdo.fault_code);
+        snprintf(line, sizeof(line), "C:%u D:%u R:%u",
+                 (unsigned int)txpdo.charge_current_ma,
+                 (unsigned int)txpdo.discharge_current_ma,
+                 (unsigned int)txpdo.internal_resistance_mohm);
         oled_show_line(48, line);
 
         OLED_Refresh();
@@ -107,6 +100,7 @@ int main(void)
 {
     board_init();
     board_init_led_pins();
+    charger_app_init();
 
     printf("EtherCAT charger user app, OTA%d\r\n", hpm_ota_get_nowrunning_app());
 
@@ -115,12 +109,6 @@ int main(void)
                 configMINIMAL_STACK_SIZE * 2,
                 NULL,
                 ECAT_TASK_PRIORITY,
-                NULL);
-    xTaskCreate(charger_task,
-                "charger",
-                configMINIMAL_STACK_SIZE,
-                NULL,
-                CHARGER_TASK_PRIORITY,
                 NULL);
     xTaskCreate(modbus_master_task,
                 "modbus",
