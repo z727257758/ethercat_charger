@@ -74,14 +74,14 @@ static void oled_task(void *pvParameters)
     (void)pvParameters;
 
     OLED_Init();
-    OLED_Clear();
+    OLED_ClearBuffer();
     oled_show_line(0, "EtherCAT Charger");
     OLED_Refresh();
 
     while (1) {
         charger_app_get_txpdo(&txpdo);
 
-        OLED_Clear();
+        OLED_ClearBuffer();
         oled_show_line(0, "EtherCAT Charger");
 
         snprintf(line, sizeof(line), "State:%u OTA:%d",

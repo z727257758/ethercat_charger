@@ -153,7 +153,7 @@ void OLED_Refresh(void)
 	}
 }
 // 清屏函数
-void OLED_Clear(void)
+void OLED_ClearBuffer(void)
 {
 	uint8_t i, n;
 	for (i = 0; i < 8; i++)
@@ -163,6 +163,11 @@ void OLED_Clear(void)
 			OLED_GRAM[n][i] = 0; // 清除所有数据
 		}
 	}
+}
+
+void OLED_Clear(void)
+{
+	OLED_ClearBuffer();
 	OLED_Refresh(); // 更新显示
 }
 
