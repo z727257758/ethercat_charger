@@ -13,6 +13,12 @@ $env:HPM_APP_BASE = "D:\Workspace\toolchain\hpm_apps"
 
 The project uses the local board package under `boards/hpm5e31_LuckyCAT` and imports OTA from `HPM_APP_BASE\middleware\hpm_ota`.
 
+The EtherCAT device currently uses revision `0x00000002`, a 2-byte RxPDO control
+word, and a 14-byte TxPDO containing charger status and core measurements. See
+[`user_app/ecat/README_en.md`](user_app/ecat/README_en.md) or
+[`user_app/ecat/README_zh.md`](user_app/ecat/README_zh.md) for the complete PDO,
+Modbus, ESI/EEPROM, and SSC regeneration notes.
+
 ## Build
 
 ```powershell
