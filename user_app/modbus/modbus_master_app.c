@@ -2,11 +2,11 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "FreeRTOS.h"
 #include "agile_modbus.h"
+#include "app_log.h"
 #include "board.h"
 #include "charger_app.h"
 #include "hpm_clock_drv.h"
@@ -94,7 +94,7 @@ static void modbus_uart_init(void)
     config.rx_fifo_level = uart_rx_fifo_trg_not_empty;
 
     if (uart_init(MODBUS_UART, &config) != status_success) {
-        printf("modbus uart init failed\r\n");
+        app_log_printf("modbus uart init failed\r\n");
         while (1) {
         }
     }
@@ -328,7 +328,7 @@ void modbus_master_init(void)
                           s_modbus_read_buf,
                           sizeof(s_modbus_read_buf));
     agile_modbus_set_slave(ctx, MODBUS_SLAVE_ID);
-    printf("modbus rtu master uart2 pc08/pc09 %lu 8N1\r\n", (unsigned long)MODBUS_UART_BAUDRATE);
+    app_log_printf("modbus rtu master uart2 pc08/pc09 %lu 8N1\r\n", (unsigned long)MODBUS_UART_BAUDRATE);
 }
 
 void modbus_master_task(void *pvParameters)
@@ -361,7 +361,7 @@ void modbus_master_task(void *pvParameters)
                                                        MODBUS_CONTROL_BIT_BASE + s_active_control_bit,
                                                        s_active_control_value);
             if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
-                printf("modbus control send failed\r\n");
+                app_log_printf("modbus control send failed\r\n");
                 state = modbus_state_poll_delay;
             } else {
                 state = modbus_state_wait_control_tx_done;
@@ -374,7 +374,7 @@ void modbus_master_task(void *pvParameters)
                 state = modbus_state_wait_control_response;
                 state_start = now;
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus control tx timeout\r\n");
+                app_log_printf("modbus control tx timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -386,7 +386,7 @@ void modbus_master_task(void *pvParameters)
                     state = modbus_state_process_control_response;
                 }
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus control timeout\r\n");
+                app_log_printf("modbus control timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -394,7 +394,7 @@ void modbus_master_task(void *pvParameters)
         case modbus_state_process_control_response: {
             int rc = agile_modbus_deserialize_write_bit(ctx, read_len);
             if (rc < 0) {
-                printf("modbus control parse failed rc:%d len:%d\r\n", rc, read_len);
+                app_log_printf("modbus control parse failed rc:%d len:%d\r\n", rc, read_len);
                 state = modbus_state_poll_delay;
             } else {
                 modbus_confirm_active_control();
@@ -410,7 +410,7 @@ void modbus_master_task(void *pvParameters)
                                                               MODBUS_STATUS_BIT_BASE,
                                                               MODBUS_STATUS_BIT_COUNT);
             if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
-                printf("modbus status read send failed\r\n");
+                app_log_printf("modbus status read send failed\r\n");
                 state = modbus_state_poll_delay;
             } else {
                 state = modbus_state_wait_status_tx_done;
@@ -423,7 +423,7 @@ void modbus_master_task(void *pvParameters)
                 state = modbus_state_wait_status_response;
                 state_start = now;
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus status tx timeout\r\n");
+                app_log_printf("modbus status tx timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -435,7 +435,7 @@ void modbus_master_task(void *pvParameters)
                     state = modbus_state_process_status_response;
                 }
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus status timeout\r\n");
+                app_log_printf("modbus status timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -443,7 +443,7 @@ void modbus_master_task(void *pvParameters)
         case modbus_state_process_status_response: {
             int rc = agile_modbus_deserialize_read_input_bits(ctx, read_len, s_status_bits);
             if (rc < 0) {
-                printf("modbus status parse failed rc:%d len:%d\r\n", rc, read_len);
+                app_log_printf("modbus status parse failed rc:%d len:%d\r\n", rc, read_len);
                 state = modbus_state_poll_delay;
             } else {
                 state = modbus_state_send_parameters_read;
@@ -458,7 +458,7 @@ void modbus_master_task(void *pvParameters)
                                                               MODBUS_FEEDBACK_REG_BASE,
                                                               MODBUS_FEEDBACK_REG_COUNT);
             if (modbus_uart_send(ctx->send_buf, (uint32_t)send_len) < 0) {
-                printf("modbus parameters read send failed\r\n");
+                app_log_printf("modbus parameters read send failed\r\n");
                 state = modbus_state_poll_delay;
             } else {
                 state = modbus_state_wait_parameters_tx_done;
@@ -471,7 +471,7 @@ void modbus_master_task(void *pvParameters)
                 state = modbus_state_wait_parameters_response;
                 state_start = now;
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus parameters tx timeout\r\n");
+                app_log_printf("modbus parameters tx timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -483,7 +483,7 @@ void modbus_master_task(void *pvParameters)
                     state = modbus_state_process_parameters_response;
                 }
             } else if ((now - state_start) > pdMS_TO_TICKS(MODBUS_RESPONSE_TIMEOUT_MS)) {
-                printf("modbus parameters timeout\r\n");
+                app_log_printf("modbus parameters timeout\r\n");
                 state = modbus_state_poll_delay;
                 state_start = now;
             }
@@ -491,7 +491,7 @@ void modbus_master_task(void *pvParameters)
         case modbus_state_process_parameters_response: {
             int rc = agile_modbus_deserialize_read_registers(ctx, read_len, s_feedback_registers);
             if (rc < 0) {
-                printf("modbus parameters parse failed rc:%d len:%d\r\n", rc, read_len);
+                app_log_printf("modbus parameters parse failed rc:%d len:%d\r\n", rc, read_len);
             } else {
                 modbus_apply_feedback();
             }
