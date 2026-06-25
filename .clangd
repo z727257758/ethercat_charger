@@ -1,0 +1,8 @@
+CompileFlags:
+  CompilationDatabase: .
+  Add:
+    - --target=riscv32-unknown-elf
+
+Diagnostics:
+  UnusedIncludes: None
+  MissingIncludes: Strict
