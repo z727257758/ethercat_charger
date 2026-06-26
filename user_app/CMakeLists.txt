@@ -33,6 +33,7 @@ sdk_compile_definitions(-DDISABLE_IRQ_PREEMPTIVE=0)
 sdk_compile_definitions(-DUSE_SYSCALL_INTERRUPT_PRIORITY=1)
 sdk_compile_definitions(-DECAT_SSC_TIMER_USE_RTOS_TICK=1)
 sdk_compile_definitions(-D__ENABLE_FREERTOS=1)
+sdk_compile_definitions(-DCONFIG_FREERTOS=1)
 sdk_compile_definitions(-DCONFIG_MODBUS_MASTER=1)
 
 sdk_inc(inc)

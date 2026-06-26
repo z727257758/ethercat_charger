@@ -19,10 +19,16 @@
 ------	Includes
 ------ 
 -----------------------------------------------------------------------------------------*/
-#include <stdlib.h>
 #include <string.h>
 
 #include "hpm_common.h"
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#include "FreeRTOS.h"
+#else
+#include <stddef.h>
+void *malloc(size_t size);
+void free(void *ptr);
+#endif
 /*-----------------------------------------------------------------------------------------
 ------	
 ------	Slave Sample Code Configuration Defines
@@ -735,13 +741,21 @@ MEMCPY: Should be defined to copy data within local memory. */
 /** 
 ALLOCMEM(size): Should be defined to the alloc function to get dynamic memory */
 #ifndef ALLOCMEM
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#define ALLOCMEM(size)                            pvPortMalloc((size))
+#else
 #define ALLOCMEM(size)                            malloc((size))
+#endif
 #endif
 
 /** 
 FREEMEM(pointer): Should be defined to the free function to put back dynamic memory */
 #ifndef FREEMEM
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#define FREEMEM(pointer)                          vPortFree((pointer))
+#else
 #define FREEMEM(pointer)                          free((pointer))
+#endif
 #endif
 
 /** 
@@ -774,14 +788,22 @@ GET_MEM_SIZE(ByteSize): Round up the byte size to next matching memory boundary 
 APPL_AllocMailboxBuffer(size): Should be defined to a function to get a buffer for a mailbox service,<br>
 this is only used if the switch MAILBOX_QUEUE is set */
 #ifndef APPL_AllocMailboxBuffer
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#define APPL_AllocMailboxBuffer(size)             pvPortMalloc((size))
+#else
 #define APPL_AllocMailboxBuffer(size)             malloc((size))
+#endif
 #endif
 
 /** 
 APPL_FreeMailboxBuffer(pointer): Should be defined to a function to put back a buffer for a mailbox service,<br>
 this is only used if the switch MAILBOX_QUEUE is set */
 #ifndef APPL_FreeMailboxBuffer
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#define APPL_FreeMailboxBuffer(pointer)           vPortFree((pointer))
+#else
 #define APPL_FreeMailboxBuffer(pointer)           free((pointer))
+#endif
 #endif
 
 /** 

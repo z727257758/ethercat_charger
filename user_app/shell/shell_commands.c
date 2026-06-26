@@ -93,18 +93,23 @@ static TaskStatus_t *find_task_by_number(TaskStatus_t *tasks, UBaseType_t task_c
     return NULL;
 }
 
-static int task_cpu_compare_desc(const void *lhs, const void *rhs)
+static void sort_tasks_by_runtime(TaskStatus_t *tasks, UBaseType_t task_count)
 {
-    const TaskStatus_t *left = (const TaskStatus_t *)lhs;
-    const TaskStatus_t *right = (const TaskStatus_t *)rhs;
+    for (UBaseType_t i = 0; i < task_count; i++) {
+        UBaseType_t max_index = i;
 
-    if (left->ulRunTimeCounter < right->ulRunTimeCounter) {
-        return 1;
+        for (UBaseType_t j = i + 1U; j < task_count; j++) {
+            if (tasks[j].ulRunTimeCounter > tasks[max_index].ulRunTimeCounter) {
+                max_index = j;
+            }
+        }
+
+        if (max_index != i) {
+            TaskStatus_t tmp = tasks[i];
+            tasks[i] = tasks[max_index];
+            tasks[max_index] = tmp;
+        }
     }
-    if (left->ulRunTimeCounter > right->ulRunTimeCounter) {
-        return -1;
-    }
-    return 0;
 }
 
 static int capture_tasks(TaskStatus_t **tasks, UBaseType_t *task_count, configRUN_TIME_COUNTER_TYPE *total_time)
@@ -175,7 +180,7 @@ static int print_ps_sample(chry_shell_t *csh, uint32_t interval_ms, bool refresh
         }
     }
 
-    qsort(second_tasks, second_count, sizeof(TaskStatus_t), task_cpu_compare_desc);
+    sort_tasks_by_runtime(second_tasks, second_count);
     if (refresh_screen) {
         csh_printf(csh, "\033[H\033[J");
         csh_printf(csh, "top - %ums refresh\r\n", (unsigned int)interval_ms);

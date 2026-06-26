@@ -1,7 +1,6 @@
 #ifndef ETHERCAT_CHARGER_OTA_CONFIG_H
 #define ETHERCAT_CHARGER_OTA_CONFIG_H
 
-#include <stdlib.h>
 #include "hpm_soc.h"
 
 #if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
@@ -35,8 +34,16 @@ static inline void hpm_mutex_put(hpm_mutex_handle_t mutex)
 
 #define HEADER_INIT_VERSION         (0x00010000U)
 
+#if defined(CONFIG_FREERTOS) && CONFIG_FREERTOS
+#define ota_malloc(...)             pvPortMalloc(__VA_ARGS__)
+#define ota_free(...)               vPortFree(__VA_ARGS__)
+#else
+#include <stddef.h>
+void *malloc(size_t size);
+void free(void *ptr);
 #define ota_malloc(...)             malloc(__VA_ARGS__)
 #define ota_free(...)               free(__VA_ARGS__)
+#endif
 
 #ifdef HPM_PGPR0
 #define HPM_OTA_INFO_RAM_ADDR       (HPM_PGPR0)

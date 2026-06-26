@@ -38,7 +38,6 @@ V5.10.1 : Start file change log
 #define _APPL_INTERFACE_H_
 
 #include "ecat_def.h"
-#include <stdlib.h>
 #include <string.h>
 #include "esc.h"
 #include "ecatslv.h"
