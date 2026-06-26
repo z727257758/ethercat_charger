@@ -5,7 +5,7 @@
 
 #include "shell.h"
 
-static volatile bool s_app_log_enabled = true;
+static volatile bool s_app_log_enabled = false;
 static volatile bool s_shell_ready;
 
 void app_log_set_enabled(bool enabled)
