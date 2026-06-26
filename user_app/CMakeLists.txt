@@ -35,6 +35,7 @@ sdk_compile_definitions(-DECAT_SSC_TIMER_USE_RTOS_TICK=1)
 sdk_compile_definitions(-D__ENABLE_FREERTOS=1)
 sdk_compile_definitions(-DCONFIG_FREERTOS=1)
 sdk_compile_definitions(-DCONFIG_MODBUS_MASTER=1)
+sdk_compile_definitions(-DAPP_VERSION_STRING=${APP_VERSION_STRING})
 
 sdk_inc(inc)
 sdk_inc(../common)
