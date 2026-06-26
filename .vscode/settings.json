@@ -1,6 +1,6 @@
 {
   "clangd.arguments": [
-    "--compile-commands-dir=${workspaceFolder}",
+    "--compile-commands-dir=D:\\Workspace\\project\\ethercat_charger\\build\\ninja\\user_app",
     "--query-driver=D:\\Workspace\\toolchain\\sdk_env_v1.11.0\\toolchains\\rv32imac_zicsr_zifencei_multilib_b_ext-win\\bin\\riscv32-unknown-elf-gcc.exe"
   ],
   "C_Cpp.intelliSenseEngine": "disabled"
