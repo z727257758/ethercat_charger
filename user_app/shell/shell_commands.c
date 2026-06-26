@@ -600,6 +600,21 @@ static int shell_led(int argc, char **argv)
 }
 CSH_CMD_EXPORT_ALIAS(shell_led, led, );
 
+static int shell_clear(int argc, char **argv)
+{
+    chry_shell_t *csh = shell_from_argv(argc, argv);
+
+    (void)argv;
+    if (argc != 1) {
+        csh_printf(csh, "usage: clear\r\n");
+        return -1;
+    }
+
+    csh_printf(csh, "\033[H\033[J");
+    return 0;
+}
+CSH_CMD_EXPORT_ALIAS(shell_clear, clear, );
+
 static int shell_log(int argc, char **argv)
 {
     chry_shell_t *csh = shell_from_argv(argc, argv);
