@@ -14,6 +14,11 @@
 #include "task.h"
 
 #define CHARGER_CONTROL_MASK (0x007FU)
+#define PS_DEFAULT_INTERVAL_MS (200U)
+#define PS_MAX_INTERVAL_MS     (10000U)
+#define TOP_DEFAULT_INTERVAL_MS (1000U)
+#define TOP_DEFAULT_COUNT       (0U)
+#define TOP_MAX_COUNT           (1000U)
 
 static chry_shell_t *shell_from_argv(int argc, char **argv)
 {
@@ -39,6 +44,26 @@ static bool parse_u16(const char *text, uint16_t *value)
     return true;
 }
 
+static bool parse_u32_range(const char *text, uint32_t min_value, uint32_t max_value, uint32_t *value)
+{
+    char *end = NULL;
+    unsigned long parsed;
+
+    if ((text == NULL) || (value == NULL) || (text[0] == '\0')) {
+        return false;
+    }
+
+    errno = 0;
+    parsed = strtoul(text, &end, 0);
+    if ((errno != 0) || (end == text) || (*end != '\0') ||
+        (parsed < min_value) || (parsed > max_value)) {
+        return false;
+    }
+
+    *value = (uint32_t)parsed;
+    return true;
+}
+
 static char task_state_char(eTaskState state)
 {
     switch (state) {
@@ -55,6 +80,136 @@ static char task_state_char(eTaskState state)
     default:
         return '?';
     }
+}
+
+static TaskStatus_t *find_task_by_number(TaskStatus_t *tasks, UBaseType_t task_count, UBaseType_t task_number)
+{
+    for (UBaseType_t i = 0; i < task_count; i++) {
+        if (tasks[i].xTaskNumber == task_number) {
+            return &tasks[i];
+        }
+    }
+
+    return NULL;
+}
+
+static int task_cpu_compare_desc(const void *lhs, const void *rhs)
+{
+    const TaskStatus_t *left = (const TaskStatus_t *)lhs;
+    const TaskStatus_t *right = (const TaskStatus_t *)rhs;
+
+    if (left->ulRunTimeCounter < right->ulRunTimeCounter) {
+        return 1;
+    }
+    if (left->ulRunTimeCounter > right->ulRunTimeCounter) {
+        return -1;
+    }
+    return 0;
+}
+
+static int capture_tasks(TaskStatus_t **tasks, UBaseType_t *task_count, configRUN_TIME_COUNTER_TYPE *total_time)
+{
+    UBaseType_t capacity = uxTaskGetNumberOfTasks() + 4U;
+    TaskStatus_t *snapshot = pvPortMalloc(capacity * sizeof(TaskStatus_t));
+
+    if (snapshot == NULL) {
+        return -1;
+    }
+
+    *task_count = uxTaskGetSystemState(snapshot, capacity, total_time);
+    if (*task_count > capacity) {
+        vPortFree(snapshot);
+        return -1;
+    }
+
+    *tasks = snapshot;
+    return 0;
+}
+
+static void print_ps_header(chry_shell_t *csh,
+                            uint32_t interval_ms,
+                            UBaseType_t task_count,
+                            configRUN_TIME_COUNTER_TYPE total_delta)
+{
+    csh_printf(csh,
+               "Tasks:%u  interval:%ums  heap:%u/%u bytes  ticks:%u\r\n",
+               (unsigned int)task_count,
+               (unsigned int)interval_ms,
+               (unsigned int)xPortGetFreeHeapSize(),
+               (unsigned int)xPortGetMinimumEverFreeHeapSize(),
+               (unsigned int)total_delta);
+    csh_printf(csh, "PID  S PRI STACK CPU%%   RUN(ms) NAME\r\n");
+    csh_printf(csh, "---- - --- ----- ------ -------- ----------------\r\n");
+}
+
+static int print_ps_sample(chry_shell_t *csh, uint32_t interval_ms, bool refresh_screen)
+{
+    TaskStatus_t *first_tasks = NULL;
+    TaskStatus_t *second_tasks = NULL;
+    UBaseType_t first_count = 0;
+    UBaseType_t second_count = 0;
+    configRUN_TIME_COUNTER_TYPE first_total = 0;
+    configRUN_TIME_COUNTER_TYPE second_total = 0;
+    configRUN_TIME_COUNTER_TYPE total_delta;
+    int ret = 0;
+
+    if (capture_tasks(&first_tasks, &first_count, &first_total) != 0) {
+        csh_printf(csh, "no memory for task snapshot\r\n");
+        return -1;
+    }
+
+    vTaskDelay(pdMS_TO_TICKS(interval_ms));
+
+    if (capture_tasks(&second_tasks, &second_count, &second_total) != 0) {
+        csh_printf(csh, "no memory for task snapshot\r\n");
+        ret = -1;
+        goto out;
+    }
+
+    total_delta = second_total - first_total;
+    for (UBaseType_t i = 0; i < second_count; i++) {
+        TaskStatus_t *previous = find_task_by_number(first_tasks, first_count, second_tasks[i].xTaskNumber);
+
+        if (previous != NULL) {
+            second_tasks[i].ulRunTimeCounter -= previous->ulRunTimeCounter;
+        }
+    }
+
+    qsort(second_tasks, second_count, sizeof(TaskStatus_t), task_cpu_compare_desc);
+    if (refresh_screen) {
+        csh_printf(csh, "\033[H\033[J");
+        csh_printf(csh, "top - %ums refresh\r\n", (unsigned int)interval_ms);
+    }
+    print_ps_header(csh, interval_ms, second_count, total_delta);
+
+    for (UBaseType_t i = 0; i < second_count; i++) {
+        configRUN_TIME_COUNTER_TYPE runtime_total = second_tasks[i].ulRunTimeCounter;
+        uint64_t cpu_x10 = 0;
+        uint32_t time_ms;
+
+        if (total_delta > 0U) {
+            cpu_x10 = ((uint64_t)runtime_total * 1000ULL) / (uint64_t)total_delta;
+        }
+        time_ms = (uint32_t)(((uint64_t)runtime_total + 12000ULL) / 24000ULL);
+
+        csh_printf(csh,
+                   "%4u %c %3u %5u %3u.%u %8u %-16s\r\n",
+                   (unsigned int)second_tasks[i].xTaskNumber,
+                   task_state_char(second_tasks[i].eCurrentState),
+                   (unsigned int)second_tasks[i].uxCurrentPriority,
+                   (unsigned int)second_tasks[i].usStackHighWaterMark,
+                   (unsigned int)(cpu_x10 / 10U),
+                   (unsigned int)(cpu_x10 % 10U),
+                   (unsigned int)time_ms,
+                   second_tasks[i].pcTaskName);
+    }
+
+out:
+    if (second_tasks != NULL) {
+        vPortFree(second_tasks);
+    }
+    vPortFree(first_tasks);
+    return ret;
 }
 
 static int shell_status(int argc, char **argv)
@@ -226,3 +381,59 @@ static int shell_tasks(int argc, char **argv)
     return 0;
 }
 CSH_CMD_EXPORT_ALIAS(shell_tasks, tasks, );
+
+static int shell_ps(int argc, char **argv)
+{
+    chry_shell_t *csh = shell_from_argv(argc, argv);
+    uint32_t interval_ms = PS_DEFAULT_INTERVAL_MS;
+
+    if (argc > 2) {
+        csh_printf(csh, "usage: ps [interval_ms]\r\n");
+        return -1;
+    }
+
+    if ((argc == 2) && !parse_u32_range(argv[1], 1U, PS_MAX_INTERVAL_MS, &interval_ms)) {
+        csh_printf(csh, "invalid interval_ms: %s\r\n", argv[1]);
+        csh_printf(csh, "  range: 1-%u\r\n", (unsigned int)PS_MAX_INTERVAL_MS);
+        return -1;
+    }
+
+    return print_ps_sample(csh, interval_ms, false);
+}
+CSH_CMD_EXPORT_ALIAS(shell_ps, ps, );
+
+static int shell_top(int argc, char **argv)
+{
+    chry_shell_t *csh = shell_from_argv(argc, argv);
+    uint32_t interval_ms = TOP_DEFAULT_INTERVAL_MS;
+    uint32_t count = TOP_DEFAULT_COUNT;
+    uint32_t iteration = 0;
+
+    if (argc > 3) {
+        csh_printf(csh, "usage: top [interval_ms] [count]\r\n");
+        csh_printf(csh, "  count 0 means continuous refresh\r\n");
+        return -1;
+    }
+
+    if ((argc >= 2) && !parse_u32_range(argv[1], 1U, PS_MAX_INTERVAL_MS, &interval_ms)) {
+        csh_printf(csh, "invalid interval_ms: %s\r\n", argv[1]);
+        csh_printf(csh, "  range: 1-%u\r\n", (unsigned int)PS_MAX_INTERVAL_MS);
+        return -1;
+    }
+
+    if ((argc == 3) && !parse_u32_range(argv[2], 0U, TOP_MAX_COUNT, &count)) {
+        csh_printf(csh, "invalid count: %s\r\n", argv[2]);
+        csh_printf(csh, "  range: 0-%u\r\n", (unsigned int)TOP_MAX_COUNT);
+        return -1;
+    }
+
+    while ((count == 0U) || (iteration < count)) {
+        iteration++;
+        if (print_ps_sample(csh, interval_ms, true) != 0) {
+            return -1;
+        }
+    }
+
+    return 0;
+}
+CSH_CMD_EXPORT_ALIAS(shell_top, top, );

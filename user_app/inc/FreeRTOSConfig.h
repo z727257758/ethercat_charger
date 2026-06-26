@@ -5,6 +5,7 @@
 #define FREERTOS_CONFIG_H
 
 #include "board.h"
+#include "hpm_mchtmr_drv.h"
 
 #if (portasmHAS_MTIME == 0)
 #define configMTIME_BASE_ADDRESS                (0)
@@ -33,9 +34,12 @@
 #define configCHECK_FOR_STACK_OVERFLOW          0
 #define configUSE_MALLOC_FAILED_HOOK            0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK      0
-#define configGENERATE_RUN_TIME_STATS           0
+#define configGENERATE_RUN_TIME_STATS           1
 #define configUSE_TRACE_FACILITY                1
 #define configUSE_STATS_FORMATTING_FUNCTIONS    0
+#define configRUN_TIME_COUNTER_TYPE             uint64_t
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
+#define portGET_RUN_TIME_COUNTER_VALUE()        mchtmr_get_count(HPM_MCHTMR)
 
 #define INCLUDE_vTaskPrioritySet                1
 #define INCLUDE_uxTaskPriorityGet               1
